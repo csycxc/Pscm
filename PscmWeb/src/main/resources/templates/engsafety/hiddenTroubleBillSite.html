@@ -1,0 +1,433 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link th:href="@{/css/jquery.dataTables.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/semantic.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/dataTables.semanticui.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/select.dataTables.min.css}" rel="stylesheet" type="text/css" />
+	
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<link rel="stylesheet" th:href="@{/css/jquery.treegrid.css}">
+
+<link rel="stylesheet" type="text/css" th:href="@{/css/tuodongyemian.css}"><!-- #box #leftdiv #rightdiv #line -->
+<script type="text/javascript" th:src="@{/js/addLoadEvent.js}"></script><!-- 页面默认加载多个事件 addLoadEvent(方法名1);addLoadEvent(方法名2); -->
+
+<script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/dataTables.select.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script> 
+	
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>	
+<script type="text/javascript" th:src="@{/js/jquery.treegrid.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.treegrid.bootstrap3.js}"></script>	
+<style>
+.page-container{
+ padding: 1px 5px 5px 5px;
+}
+</style>
+</head>
+<body >
+<div id="box"  class="page-container">
+	<div id="leftdiv">	
+		<!-- table -->
+		<div style="height:35px;">
+			<h4 style="float: left;color:blue;font-weight:bold;padding:5 0 0 5;">隐患类别>排查项目>排查内容 :</h4>
+		</div>
+		<div style="width:100%;height:94%;border:solid 1px #ccc; overflow:scroll;">
+			<table id="hiddenTroubleBill" class="display tree" cellspacing="0" width="100%" align=center>
+				<thead style="display: none;background-color:CadetBlue;">
+					<tr><th width="100%">顶部</th></tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+	<div id="line"></div>
+	<div id="rightdiv">
+		<!-- form -->
+		<div style="height:35px;">
+			<h4 style="float: left;color:blue;font-weight:bold;padding:5 0 0 5;">隐患详细信息 :</h4>
+			<a style="float:left;margin:0 0 0 20;" href="javascript:;" 
+				th:onclick="'hiddenTroubleBill_add(\'添加隐患\',\'' + @{/hiddenTroubleBill/edit}  + '\',\'800\',\'500\')'" class="btn btn-primary radius">
+				<i class="Hui-iconfont">&#xe600;</i>添加隐患
+			</a>
+			<div style="float:left;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+			<a style="float:left;margin:0;" class="btn btn-success radius" href="javascript:location.replace(location.href);" title="刷新" >
+				<i class="btn-refresh Hui-iconfont">&#xe68f;</i>
+			</a>
+		</div>
+		<div style="width:100%;height:94%;border:solid 1px #ccc; overflow:scroll;">
+			<form class="form form-horizontal" id="form-ht-add" th:action="@{/hiddenTrouble/editToReport2}" method="post" onsubmit="return submitCheck()">
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>隐患来源：</label>
+					<div class="formControls col-xs-3 col-sm-3">
+						<select id="troubleFrom" class="select" style="height:28px" name="troubleFrom" size="1">
+							<option value="质量隐患" selected="selected">质量隐患</option>
+							<option value="安全隐患">安全隐患</option>
+						</select>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>隐患类别：</label>
+					<div class="formControls col-xs-3 col-sm-3">
+						<span class="select-box">
+							<select id="troubleCate" class="select" name="troubleCate.enumValue" size="1">
+								<option th:value="${tc.enumValue}" th:each="tc:${tcLst}" th:text="${tc.enumValueName}">1</option>
+							</select>
+						</span>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2">隐患级别：</label>
+					<div class="formControls col-xs-3 col-sm-3">
+						<span class="select-box">
+							<select id="troubleLevel" class="select" name="troubleLevel.enumValue" size="1">
+								<option th:value="${tl.enumValue}" th:each="tl:${tlLst}" th:text="${tl.enumValueName}">1</option>
+							</select>
+						</span> 
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>排查项目：</label>
+					<div class="formControls col-xs-3 col-sm-8">
+						<input type="text" class="input-text" value="" placeholder="" id="investItem" name="investItem">
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2">划分名称：</label>
+					<div class="formControls col-xs-3 col-sm-8">
+						<label1 class="divname"></label1>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>排查内容：</label>
+					<div class="formControls col-xs-3 col-sm-8">
+						<textarea class="input-text" id="investContent" name="investContent" style="height:60px;"></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-3 col-sm-2">隐患说明：</label>
+					<div class="formControls col-xs-3 col-sm-8">
+						<textarea class="input-text" id="description" name="description" style="height:80px;"></textarea>
+					</div>
+				</div>
+					
+				<div style="display: none;" class="row cl"><!-- 其他字段隐藏 style="display: none;"-->
+					<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>划分项：</label>
+					<div class="formControls col-xs-3 col-sm-6">
+						<input type="text" class="input-text" value="" placeholder="" readonly="readonly" id="divItemCode" name="divItemCode">
+					</div>
+					<label class="form-label col-xs-3 col-sm-2">隐患编码：</label>
+					<input type="hidden" class="input-text" value="" readonly="readonly" placeholder="" id="divsncode" name="divsncode">
+					<div class="formControls col-xs-3 col-sm-2">
+						<input type="hidden" id="flag" name="flag" value="I">
+						<input type="text" class="input-text" value="" readonly="readonly" placeholder="" id="troubleCode" name="troubleCode">
+					</div>
+				</div>
+				
+				<div class="row cl">
+					<div class="col-xs-3 col-sm-2 col-xs-offset-3 col-sm-offset-2">
+				   		<button class="btn btn-primary radius" type="button" id="btn_save">&nbsp;&nbsp;保存&nbsp;&nbsp;</button>
+					</div>
+					<div class="col-xs-3 col-sm-2 col-xs-offset-3 col-sm-offset-2">
+						<button class="btn btn-primary radius" type="submit" id="btn_submit">&nbsp;生成隐患&nbsp;</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	</div>
+	<script th:inline="javaScript">
+	    var hiddenTroubleBill;
+	    var divisionsncode = "";
+	    
+	    addLoadEvent(zuoyoutuodong);//页面默认加载方法1
+	    addLoadEvent(jiazai);//页面默认加载方法2
+
+	    function jiazai(){
+	    	$("input[type='text']").val("");
+        	$("textarea").val("");
+        	$("select").val("");
+        	$("label").val("");
+			setData($("#staticDivSnCode", parent.document).val(), $("#staticDivItemCode", parent.document).val());
+	    }
+	    
+	    /* $(document).ready(function() {
+	    	$("input[type='text']").val("");
+        	$("textarea").val("");
+        	$("select").val("");
+        	$("label").val("");
+			setData($("#staticDivSnCode", parent.document).val(), $("#staticDivItemCode", parent.document).val());
+		}); */
+	    function submitCheck() {
+			if ($('#troubleCode').val() == "") {
+				layer.msg('请先选择一条隐患',{icon:1,time:1000});
+				return false;
+			} else {
+				return true;
+			}
+		}
+	 	//保存
+		$('#btn_save').click(function(){
+			if ($("#staticDivItemCode", parent.document).val() != "") {//判断是否选中了工序
+				if($("#troubleFrom").val() != "" && $("#troubleCate").val() != "" && $("#investItem").val() != "" && $("#investContent").val() != ""){//判断必填项是否完整
+					//alert($("#troubleCode").val());
+					if ($("#troubleCode").val() != "" && $("#troubleCode").val() != null) {//当troubleCode有值时，更新（$("#flag").val("U");）   添加（$("#flag").val("I");）
+						$("#flag").val("U");
+					}else{
+						$("#flag").val("I");
+					}
+					$("#divItemCode").val($("#staticDivItemCode", parent.document).val());
+					
+					divisionsncode = $("#staticDivSnCode", parent.document).val();
+		        	if(divisionsncode!=null){  getDivName(divisionsncode);  }
+		        	divisionsncode = "";
+		        	
+					jQuery.ajax({
+						cache: true,
+		                type: "POST",
+						url: /*[[@{/hiddenTroubleBill/saveHiddenTroubleBill}]]*/,
+						data: $("#form-ht-add").serialize(),
+						async: false,
+						//contentType : "application/x-www-form-urlencoded",
+						success: function(data){
+							if (data.result == true) {
+								layer.msg('保存成功!',{icon:1,time:1000}, function(){
+									$("#flag").val("U");
+									setData($("#staticDivSnCode", parent.document).val(), $("#staticDivItemCode", parent.document).val());
+								});
+							} else {
+								layer.msg(data.retMsg,{icon:1,time:1000})
+							}
+						},
+		                error: function(XmlHttpRequest, textStatus, errorThrown){
+							layer.msg(data.retMsg,{icon:1,time:1000});
+						}
+					});
+				}else{
+					layer.msg('带红*号的为必填项，请填写后保存！',{icon:1,time:3000});
+				}
+			}else{
+				layer.msg('请先选择划分!',{icon:1,time:2000});
+			}
+		});
+	    function getDivName(divisionsncode){
+	    	if(divisionsncode == null || divisionsncode == ""){
+	    		$(".divname").text("");
+	    	}else{
+	    		jQuery.ajax({
+		    		type:"post",
+		    		url:/*[[@{/engDivision/findEngDivisionByPrimaryKey}]]*/,
+		    		data:{divisionsncode:divisionsncode},
+		    		success:function(data){
+		    			$(".divname").text(data.divName);
+		    		}
+		    	});
+	    	}
+	    }
+	    $("#troubleFrom").change(function(){
+	    	var selObj = $("#troubleCate");
+			$("#troubleCate").empty();
+    		if ($("#troubleFrom").val() == "质量隐患") {
+       			var tc = /*[[${tcLst}]]*/
+    			for( var p in tc) {
+    				selObj.append('<option value="' + tc[p].enumValue + '">' + tc[p].enumValueName + '</option>');
+    			}
+       			/* #foreach( $tc in $tcLst)
+    				selObj.append('<option value="$tc.enumValue">$tc.enumValueName</option>');
+    			#end  */
+       		} else {
+       			var tc1 = /*[[${tcLst1}]]*/
+    			for( var p in tc1) {
+    				selObj.append('<option value="' + tc1[p].enumValue + '">' + tc1[p].enumValueName + '</option>');
+    			}
+       			/* #foreach( $tc in $tcLst1)
+    				selObj.append('<option value="$tc.enumValue">$tc.enumValueName</option>');
+    			#end  */
+       		}
+    	});
+		/*隐患-添加*/
+		function hiddenTroubleBill_add(title,url,w,h){
+			divisionsncode = $("#staticDivSnCode", parent.document).val();
+        	if(divisionsncode!=null){  getDivName(divisionsncode);  }
+        	divisionsncode = "";
+			if ($("#staticDivItemCode", parent.document).val() != "") {
+	        	$("input[type='text']").val("");
+	        	$("textarea").val("");
+	        	$("select").val("");
+	        	$("#flag").val("I");
+	        	$("#divItemCode").val($("#staticDivItemCode", parent.document).val());
+	        	$("#divsncode").val($("#staticDivSnCode", parent.document).val());
+	        	$("#troubleCode").removeAttr("readonly");
+			} else {
+				layer.msg('请先选择划分!',{icon:1,time:1000});
+			}
+		}
+		/*隐患-编辑*/
+		function hiddenTrouble_edit(title,url,w,h){
+			var index = layer.open({
+				type: 2,
+				title: title,
+				content: url +"&divCode=" + $("#staticDivItemCode", parent.document).val()
+			});
+			layer.full(index);
+		}
+		/*隐患-删除*/
+		function hiddenTroubleBill_del(obj,id){
+			layer.confirm('确认要删除吗？',function(index){
+				jQuery.ajax({
+					type : 'POST',
+					url : /*[[@{/hiddenTroubleBill/deleteHiddenTroubleBill}]]*/,
+					data : {"troubleCodes" : id},
+					//dataType: 'json',
+					success: function(data){
+						$(obj).parents("tr").remove();
+						layer.msg('删除成功!',{icon:1,time:1000});
+						$("#flag").val("I");
+			        	$("input[type='text']").val("");
+			        	$("textarea").val("");
+			        	$("#divItemCode").val($("#staticDivItemCode", parent.document).val());
+					},
+					error:function(data) {
+						layer.msg('删除失败!',{icon:1,time:1000});
+						console.log(data.msg);
+					},
+				});		
+			});
+		}
+		
+		function setData(divSnCode, d) {
+			//$("#divItemCode").val(d);
+			//$("#divsncode").val(divSnCode);
+        	$("#form-ht-add").form("clear");//清空form
+        	$("label1").text("");//清空label1,其中label1为要显示的数据自定义的标签
+        	
+			layer.closeAll();
+			if ($('#hiddenTroubleBill').hasClass('dataTable')){
+				//userTable.fnClearTable(false);//清空数据.fnClearTable();//清空数据  
+				hiddenTroubleBill.destroy(); //还原初始化了的datatable  
+			}
+			hiddenTroubleBill = $('#hiddenTroubleBill').DataTable({
+				ajax : /*[[@{/hiddenTroubleBill/findTroubleCateInvestItem}]]*/,
+				"searching":false,//去掉右上角的搜索框
+				"info": false,//去掉底部文字
+				fnServerParams : function (aoData) {
+					aoData.push(
+						{ name : "divItemCode", value : d}, { name : "fromCode", value : '现场增加'}
+					);
+				},
+				columns : [
+					{ data : "investContent", "sDefaultContent" : "" }
+				],
+				"ordering": false,
+		        "paging": false,
+		        language:{
+		        	"sEmptyTable": "数据为空"
+		        },
+				select: {
+		            style: 'single'
+		        },
+		        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+	        		$(nRow).addClass(aData.classname);
+	        		$(nRow).attr("id", aData.classid);
+		         },
+		         "initComplete": function ( settings ) {
+		        	 $('#hiddenTroubleBill').treegrid({
+		                 'initialState': 'collapsed'
+		             });
+		        	 $("tr[class*='treegrid-i']").on('expand', function(){
+			        	 var id = $(this).attr("id");
+			        	 if ($(this).treegrid('getChildNodes').length == 0) {
+			        		 var h = 0;
+			        		 if ($(this).treegrid('getParentNodeId').length > 1) {
+			        			 h = $(this).treegrid('getParentNodeId').substring(1)
+			        		 }
+			        		 jQuery.ajax({
+			     				type: "POST",
+			     				url: /*[[@{/hiddenTroubleBill/findHiddTrouListByTroCateInvItem}]]*/,
+			     				data:{
+			     					divItemCode: d,
+			     					fromCode : '现场增加',
+			     					troubleCate : h,
+			     					investItem : $('td:eq(0)', $(this)).text(),
+			     					i:id
+			     				},
+			     				success:function(data){
+			     					var html = "";
+		     						for(var i=0;i<data.data.length;i++){
+		     							html += '<tr role="row" class="'+data.data[i].classname+'" style="display: table-row;"><span class="treegrid-expander"></span>'
+		     								 +'<td>'+ data.data[i].investContent +'</td>'
+		     								 +'<td  style="display:none">'+data.data[i].troubleCode+'</td>'
+		     								 +'<td  style="display:none">'+data.data[i].troubleLevel.enumValue+'</td>'
+		     								 +'<td  style="display:none">'+data.data[i].troubleFrom+'</td>'
+		     								 +'<td  style="display:none">'+data.data[i].investItem+'</td>'
+		     								 +'<td  style="display:none">'+data.data[i].divItemCode+'</td>'
+		     								 +'<td  style="display:none">'+data.data[i].troubleCate.enumValue+'</td>'
+		     								 +'<td  style="display:none">'+data.data[i].description+'</td>'
+		     								 +'<td style="text-decoration:none" class="ml-5" onClick="hiddenTroubleBill_del(this,\'' + data.data[i].troubleCode + '\')" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></td></tr>';
+		     						}
+		     						$("tr[id='" +id+ "']").after(html);
+		     						$("tr[class*='treegrid-parent-" + id + "']").each(function(){
+		     						    $(this).treegrid('setTreeContainer', $('#hiddenTroubleBill'));
+			     						$(this).treegrid('initExpander').treegrid('initIndent').treegrid('initEvents').treegrid('initState').treegrid('initChangeEvent').treegrid("initSettingsEvents");
+		     						});
+		     						$("tr[class*='treegrid-parent-" + id + "']").click(function() {//为表格的行添加点击事件
+		     							$(this).css("background","#8EE5EE").siblings().css("background","");//改变当前选中行背景色
+		     							var tr = $(this);
+		     							var tdArr = tr.find("td");
+		     							
+	     								$(".divname").text("");//置空
+		     							$(".investContent").text("");//置空
+		     							$(".divItemCode").text("");//置空
+		     							$(".description").text("");//置空
+		     							$(".investItem").text("");//置空
+		     							
+		     							divisionsncode = $("#staticDivSnCode", parent.document).val();
+		     				        	if(divisionsncode!=null){  getDivName(divisionsncode);  }
+		     				        	divisionsncode = "";
+		     							var selObj = $("#troubleCate");
+		     							$("#troubleCate").empty();
+		     							if (tdArr.eq(3).text() == "质量隐患") {
+		     				    			var tc = /*[[${tcLst}]]*/
+	     				    				for( var p in tc) {
+	     				    					selObj.append('<option value="' + tc[p].enumValue + '">' + tc[p].enumValueName + '</option>');
+	     				    				}
+		     				    		} else {
+		     				    			var tc1 = /*[[${tcLst1}]]*/	
+		     				    			for( var p in tc1) {
+			     				   				selObj.append('<option value="' + tc1[p].enumValue + '">' + tc1[p].enumValueName + '</option>');
+			     				   			}
+		     				    		}
+		     							$("#investContent").val(tdArr.eq(0).text());//排查内容 
+		     				            $(".investContent").text(tdArr.eq(0).text());//排查内容 
+		     				           	$("#troubleCode").val(tdArr.eq(1).text());//隐患编码
+		     				            $("#troubleLevel").val(tdArr.eq(2).text());//隐患级别
+		     				            $("#troubleFrom").val(tdArr.eq(3).text());//隐患来源
+		     				           	$("#investItem").val(tdArr.eq(4).text());//排查项目
+		     				            $(".investItem").text(tdArr.eq(4).text());//排查项目
+		     				            $("#divItemCode").val(tdArr.eq(5).text());//划分项编码
+		     				            $(".divItemCode").text(tdArr.eq(5).text());//划分项编码
+		     				            $("#troubleCate").val(tdArr.eq(6).text());//隐患类别
+		     				            $("#description").val(tdArr.eq(7).text());//隐患说明
+		     				            $(".description").text(tdArr.eq(7).text());//隐患说明 
+		     				            $("#divsncode").val(divSnCode);//划分编码
+	     							});
+			     				}
+			     			});
+			        	 }
+		        	})
+		         }
+			});
+		}
+	</script>
+</body>
+</html>

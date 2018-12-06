@@ -1,0 +1,153 @@
+<html>
+<head>
+<meta charset="utf-8">
+<link href="$ctx/static/css/jquery.dataTables.min.css" rel="stylesheet"
+	type="text/css" />
+<link href="$ctx/static/css/semantic.min.css" rel="stylesheet"
+	type="text/css" />
+<link href="$ctx/static/css/dataTables.semanticui.min.css"
+	rel="stylesheet" type="text/css" />
+<link href="$ctx/static/lib/lightbox2/2.8.1/css/lightbox.css" rel="stylesheet" type="text/css" >
+
+<link rel="stylesheet" type="text/css" href="$ctx/static/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="$ctx/static/css/H-ui.admin.css" />
+<link rel="stylesheet" type="text/css" href="$ctx/static/lib/Hui-iconfont/1.0.8/iconfont.css" />
+<link rel="stylesheet" type="text/css" href="$ctx/static/skin/default/skin.css" id="skin" />
+<link rel="stylesheet" type="text/css" href="$ctx/static/lib/webuploader/0.1.5/webuploader.css" />
+
+<script type="text/javascript"
+	src="$ctx/static/lib/jquery/jquery-1.12.4.js"></script>
+<script type="text/javascript"
+	src="$ctx/static/lib/jquery/jquery.dataTables.min.js"></script>
+<script type="text/javascript"
+	src="$ctx/static/lib/jquery/semantic.min.js"></script>
+<script type="text/javascript" src="$ctx/static/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="$ctx/static/lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="$ctx/static/js/H-ui.min.js"></script>
+<script type="text/javascript" src="$ctx/static/js/H-ui.admin.js"></script>
+<script type="text/javascript" src="$ctx/static/lib/webuploader/0.1.5/webuploader.min.js"></script>
+<title>进度填报</title>
+</head>
+<body>
+<article class="page-container">
+	<form class="form form-horizontal" id="form-ht-add">
+	<input type="hidden" id ="flag" name="flag" value="$flag">
+	#if($r)
+	<div class="row cl">
+		<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>工程划分：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<input type="text"  value="$r.divname" id="divname" name="divname" readonly="readonly" class="input-text">
+			<input type="hidden" id ="divcode" name="divcode" value="$r.divcode">
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>日期：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<input type="text"  value="$!date.format('yyyy-MM-dd',$r.workdate)" readonly="readonly" id="workdate" name="workdate" class="input-text Wdate">
+		</div>
+	</div>
+	#else
+	<div class="row cl">
+		<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>工程划分：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<span class="select-box" style="width:100%;">
+				<select id="divcode" class="select" name="divcode" size="1">
+				#foreach( $div in $divLst)
+					<option value="$div.divisioncode" #if($div.divisioncode==$r.divcode)selected="selected"#end>$div.divname</option>
+				#end
+				</select>
+			</span> 
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-3"><span class="c-red">*</span>日期：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<input type="text"  value="#if($r)$!date.format('yyyy-MM-dd',$r.workdate)#end" onfocus="WdatePicker({ dateFmt:'yyyy-MM-dd'})" id="workdate" name="workdate" class="input-text Wdate">
+		</div>
+	</div>
+	#end
+	<div class="row cl">
+		<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>完成数量：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<input class="input-text" value="#if($r)$r.finishnumber#end" id="finishnumber" name="finishnumber">
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-4 col-sm-3">完成位置：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<textarea class="input-text" id="finishwhere" name="finishwhere" style="height:100px;">#if($r&&$r.finishwhere)$r.finishwhere#end</textarea>
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-4 col-sm-3">说明：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<textarea class="input-text" id="description" name="description" style="height:100px;">#if($r&&$r.description)$r.description#end</textarea>
+		</div>
+	</div>
+	<div class="row cl">
+		<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+			<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;保存&nbsp;&nbsp;">
+		</div>
+	</div>
+	</form>
+</article>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#form-ht-add").validate({
+		rules:{
+			divcode:{
+				required:true
+			},
+			workdate:{
+				required:true
+			},
+			finishwhere:{
+				maxlength:100
+			},
+			description:{
+				maxlength:100
+			},
+			finishnumber:{
+				required:true,
+				isIntGtZero:true
+			}
+		},
+		onkeyup:false,
+		focusCleanup:true,
+		success:"valid",
+		submitHandler:function(form){
+			$(form).ajaxSubmit({
+				cache: true,
+                type: "POST",
+				url: "$ctx/techDisclosure/saveEngDivFinishRate",
+				data: $("#form-ht-add").serialize(),
+				async: false,
+				//contentType : "application/x-www-form-urlencoded",
+				success: function(data){
+					if (data.result == true) {
+						layer.msg('保存成功!',{icon:1,time:1000}, function(){
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.$('.btn-refresh').click();
+							parent.layer.close(index);
+						});
+					} else {
+						layer.msg(data.retMsg,{icon:1,time:3000})
+					}
+				},
+                error: function(XmlHttpRequest, textStatus, errorThrown){
+					layer.msg('保存失败!',{icon:1,time:1000});
+				}
+			});
+		}
+	});
+});
+
+</script> 
+<!--/请在上方写此页面业务相关的脚本-->
+<script type="text/javascript" src="$ctx/static/lib/jquery.validation/1.14.0/jquery.validate.js"></script> 
+<script type="text/javascript" src="$ctx/static/lib/jquery.validation/1.14.0/validate-methods.js"></script> 
+<script type="text/javascript" src="$ctx/static/lib/jquery.validation/1.14.0/messages_zh.js"></script> 
+<script type="text/javascript" src="$ctx/static/lib/lightbox2/2.8.1/js/lightbox.js"></script>
+</body>
+</html>

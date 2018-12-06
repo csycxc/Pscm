@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link th:href="@{/css/jquery.dataTables.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/semantic.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/dataTables.semanticui.min.css}"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/css/select.dataTables.min.css}"
+	rel="stylesheet" type="text/css" />
+<link rel="stylesheet" th:href="@{/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css}" type="text/css">
+	
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript" th:src="@{/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/zTree/v3/api/apiCss/jquery.ztree.core-3.5.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/zTree/v3/js/jquery.ztree.excheck-3.5.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/dataTables.select.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/semantic.min.js}"></script>
+	
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>	
+<style>
+.page-container{
+ padding: 1px 5px 5px 5px;
+}
+</style>
+</head>
+<body >
+
+	<div class="page-container">
+		<div class="cl pd-3 bg-1 bk-gray">
+			<span class="l">
+				<!-- <a href="javascript:;" onclick="datadel()" class="btn btn-danger radius">
+					<i class="Hui-iconfont">&#xe6e2;</i>删除
+				</a> -->
+				<a href="javascript:;" onclick="saveDivrRole()" class="btn btn-primary radius">
+					<i class="Hui-iconfont">&#xe600;</i>保存
+				</a>
+			</span>
+			<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" >
+				<i class="btn-refresh Hui-iconfont">&#xe68f;</i>
+			</a>
+		</div>
+
+
+		<div style="float:left;border:1px width:50%; padding-left: 5px">
+			<table id="role" class="display" cellspacing="0"
+				width="100%" align=center>
+				<thead>
+					<tr>
+						<th>角色编码</th>
+						<th>角色名称</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<!-- 下面这个div是树形结构 -->
+		<div style="float:left;border:1px width:50%; padding-left: 5px">
+			<div class="zTreeDemoBackground left">  
+	           <ul id="treeDemo" class="ztree"></ul>  
+	        </div>  
+		</div>
+	</div>
+	<script th:inline="javascript">
+	var basePath = /*[[@{/}]]*/;  
+		var staticRoleCode;
+		staticRoleCode = "";
+        var setting = {
+            check: {enable: true,nocheckInherit: false,chkStyle: "checkbox"},  
+            data: {simpleData: {enable: true}}  
+        };
+    	//ztree用于初始化的静态数据          
+        var zNodes = [  
+            { id: 1, pId: 0, name: "随意勾选 1" },  
+            { id: 11, pId: 1, name: "随意勾选 1-1" },  
+            { id: 111, pId: 11, name: "无 checkbox 1-1-1" },  
+            { id: 112, pId: 11, name: "随意勾选 1-1-2" },  
+            { id: 12, pId: 1, name: "无 checkbox 1-2" },  
+            { id: 2, pId: 0, name: "随意勾选 2" },  
+        ]; 
+        //过滤节点的机制 直接return node表示不做任何过滤  
+        function filter(node) {   return node;  }  
+        ///动态设置zTree的所有节点有checkbox  
+        function DynamicUpdateNodeCheck() {  
+            var zTree = jQuery.fn.zTree.getZTreeObj("treeDemo");  
+            //根据过滤机制获得zTree的所有节点              
+            var nodes = zTree.getNodesByFilter(filter);  
+            //遍历每一个节点然后动态更新nocheck属性值  
+            for (var i = 0; i < nodes.length; i++) {  
+                var node = nodes[i];  
+                node.nocheck = false; //表示显示checkbox  
+                zTree.updateNode(node);  
+            }  
+        }  
+        
+        $(document).ready(function() {
+        	//查询角色列表                $ctx  =   ${pageContext.request.contextPath}
+			var roleTable = $('#role').DataTable({
+				ajax : "$ctx/roledivision/getRoleList",
+				columns : [{
+					data : "rolecode"
+				},{
+					data : "name",
+					"sDefaultContent" : ""
+	            }],
+				select: {
+		            style: 'single'
+		        }
+			});
+        	//查询划分 树
+			roleTable.on( 'select', function ( e, dt, type, indexes ) {
+	            var rowData = roleTable.rows( indexes ).data().toArray();
+	            staticRoleCode = rowData[0].rolecode
+	            jQuery.ajax({
+					type : 'POST',
+					url : basePath + 'roledivision/findRoleDivisions',//方法返回的是List<EngDivision> engDivisionList
+					data : {"roleCode" : staticRoleCode},//提交的data
+					//dataType: 'json',
+					success: function(data){   //data -----engDivisionList
+						CancelAllNodes();//全取消选择，然后判断角色中是否有该划分项。
+						if(data) {//返回的data    engDivisionList
+							for (var i = 0; i < data.length; i++) {
+								var d = data[i];
+								menuTree.checkNode(menuTree.getNodeByParam("id", d.divisionsncode, null), true, false);
+							}
+						}
+					},
+					error:function(data) {
+					}
+				});	
+		            //events.prepend( '<div><b>'+type+' selection</b> - '+JSON.stringify( rowData )+'</div>' );
+	        }).on( 'deselect', function ( e, dt, type, indexes ) {
+	        	staticRoleCode = "";
+	        	CancelAllNodes();
+	        });
+        	//树形结构的数据
+			var menu = $("#treeDemo");
+			menu = jQuery.fn.zTree.init(menu,setting,$menuN);
+			var menuTree = jQuery.fn.zTree.getZTreeObj("treeDemo");
+		});
+		/*保存角色有哪些勾选的划分项*/
+		function saveDivrRole() {       //=========================================
+			var treeObj = jQuery.fn.zTree.getZTreeObj("treeDemo");
+			var nodes = treeObj.getCheckedNodes();
+			if (staticRoleCode == "") {
+				layer.msg('请先选择一条角色!',{icon:1,time:1000});
+				return;
+			}
+			if (nodes.length > 0) {
+				var ids = "";
+				for (var i=0; i < nodes.length; i++) {
+					var node = nodes[i]
+					if (ids == "") {
+						ids = node.id;
+					} else {
+						ids += "," + node.id;
+					}
+				}
+				jQuery.ajax({
+					type : 'POST',
+					url : basePath + 'roledivision/saveRoleDivisions',
+					data : {"roleCode" : staticRoleCode, "ids" : ids},
+					//dataType: 'json',
+					success: function(data){
+						layer.msg('保存成功!',{icon:1,time:1000});
+					},
+					error:function(data) {
+						layer.msg('保存失败!',{icon:1,time:1000});
+					}
+				});	
+			}else{    //什么划分都没有的时候，删除
+				jQuery.ajax({
+					type : 'POST',
+					url : basePath + 'roledivision/deleteRoleDivisions',
+					data : {"roleCode" : staticRoleCode},
+					//dataType: 'json',
+					success: function(data){
+						layer.msg('删除成功!',{icon:1,time:1000});
+					},
+					error:function(data) {
+						layer.msg('删除失败!',{icon:1,time:1000});
+					}
+				});
+			}
+		}
+		
+		function datadel() {
+			
+		}
+		
+		//全选
+        function CheckAllNodes() {
+            var treeObj = jQuery.fn.zTree.getZTreeObj("treeDemo");
+            treeObj.checkAllNodes(true);
+        }
+        //全取消
+        function CancelAllNodes() {
+            var treeObj = jQuery.fn.zTree.getZTreeObj("treeDemo");
+            treeObj.checkAllNodes(false);
+        }
+        
+        
+	</script>
+	<!-- body{
+		color:blue;
+		background-color:green;
+	} -->
+</body>
+</html>

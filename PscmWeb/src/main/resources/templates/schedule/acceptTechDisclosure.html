@@ -1,0 +1,123 @@
+<html>
+<head>
+<meta charset="utf-8">
+<link href="$ctx/static/css/jquery.dataTables.min.css" rel="stylesheet"
+	type="text/css" />
+<link href="$ctx/static/css/semantic.min.css" rel="stylesheet"
+	type="text/css" />
+<link href="$ctx/static/css/dataTables.semanticui.min.css"
+	rel="stylesheet" type="text/css" />
+
+<link rel="stylesheet" type="text/css" href="$ctx/static/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="$ctx/static/css/H-ui.admin.css" />
+<link rel="stylesheet" type="text/css" href="$ctx/static/lib/Hui-iconfont/1.0.8/iconfont.css" />
+<link rel="stylesheet" type="text/css" href="$ctx/static/skin/default/skin.css" id="skin" />
+
+<script type="text/javascript"
+	src="$ctx/static/lib/jquery/jquery-1.12.4.js"></script>
+<script type="text/javascript"
+	src="$ctx/static/lib/jquery/jquery.dataTables.min.js"></script>
+<script type="text/javascript"
+	src="$ctx/static/lib/jquery/semantic.min.js"></script>
+	
+<script type="text/javascript" src="$ctx/static/lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="$ctx/static/js/H-ui.min.js"></script>
+<script type="text/javascript" src="$ctx/static/js/H-ui.admin.js"></script>	
+<style>
+.page-container{
+ padding: 1px 5px 5px 5px;
+}
+</style>
+</head>
+<body >
+	<div class="page-container">
+		<div class="cl pd-3 bg-1 bk-gray">
+			<span class="l"><!-- a href="javascript:;" onclick="datadel()"
+				class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i>
+					批量删除</a--><i></i>
+					</span>
+				<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="btn-refresh Hui-iconfont">&#xe68f;</i></a>
+		</div>
+
+		<table id="techDisclosure" class="ui celled table" cellspacing="0"
+			width="100%" align=center>
+			<thead>
+				<tr>
+					<th>交底者</th>
+					<th>交底时间</th>
+					<th>交底级别</th>
+					<th>交底工程项编码</th>
+					<th>交底对象</th>
+					<th>交底内容</th>
+					<th>交底包括项</th>
+					<th width="30" align="center">操作</th>
+				</tr>
+			</thead>
+		</table>
+
+	</div>
+	<script language="JavaScript">
+		$(document).ready(function() {
+			$('#techDisclosure').DataTable({
+				ajax : "techDisclosure/getAcceptTechDisclosureList",
+				columns : [{
+					data : "disclosurer"
+				}, {
+					data : "disdate",
+					"sDefaultContent" : "",
+					render : function(data) {
+						if (data) {
+							return data.substring(0,10)
+						}
+					}
+				}, {
+					data : "dislevel",
+					"sDefaultContent" : ""
+				}, {
+					data : "disdivcode",
+					"sDefaultContent" : ""
+				}, {
+					data : "disclo",
+					"sDefaultContent" : ""
+				}, {
+					data : "disclocontent"
+				}, {
+					data : "discloinclude",
+					"sDefaultContent" : ""
+				}, {
+	                 "sClass": "center",
+	                 "data": null,
+	                 "orderable": false,  
+	                 "render": function (data, type, full, meta) {
+                		 return '<a style="text-decoration:none" class="ml-5" onClick="techDisclosure_add(\'技术交底查看\',\'$ctx/techDisclosure/view?disclosureCode=' + data.disclosurecode + '\',\'800\',\'500\')" href="javascript:;" title="查看"><i class="Hui-iconfont">&#xe6df;</i></a>';
+                	 }
+	            }],
+	            "aoColumnDefs": [
+	          	  {"orderable":false,"aTargets":[7]}// 不参与排序的列
+	          	]
+				//"aaSorting": [[ 1, "desc" ]],
+				/* createdRow: function( nRow, aData, iDisplayIndex ) {
+					if (aData.rectifytime) {
+						 var date1 = new Date(aData.rectifytime.replace(/-/g,"/"));
+						 var date2 = new Date(aData.rectifytimelimit.replace(/-/g,"/"));
+						 AddDays(date2, aData.rectifypostpone)
+						 if (date1 > date2) {
+				        	nRow.style.backgroundColor="red";
+						 }
+					}
+			    } */
+			});
+		});
+		
+		/*技术交底处理-添加*/
+		function techDisclosure_add(title,url,w,h){
+			var index = layer.open({
+				type: 2,
+				title: title,
+				content: url
+			});
+			layer.full(index);
+		}
+	</script>
+
+</body>

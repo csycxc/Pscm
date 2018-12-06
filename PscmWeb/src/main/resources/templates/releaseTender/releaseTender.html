@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/semantic.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/dataTables.semanticui.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/buttons.dataTables.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/select.dataTables.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/themes/default/easyui.css}"/>
+
+<link rel="stylesheet" type="text/css" th:href="@{/editor-app/libs/bootstrap_3.1.1/css/bootstrap.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-editable.css}" />
+
+<script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>	
+<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/dataTables.select.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/dataTables.buttons.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+
+<script type="text/javascript" th:src="@{/js/bootstrap-editable.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-table.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-table-editable.js}"></script>
+<style>
+.option_show{height: 28px;width: 80px;}
+.option_div{float:left;margin-top: 13px;margin-left:15px;padding-right: 40px;font-size: 16px;}
+.a-link{color: #0066CC;}
+.td-style{padding: 12px 0px 12px 5px;border: none;width: 120px;}
+#release,#release tr,#release tr td{border:1px solid #909090;}
+</style>
+</head>
+<body class="easyui-layout">
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    var basePath = /*[[@{/}]]*/;
+    /*]]>*/
+</script>
+	<div data-options="region:'west',split:true"  style="width:70%;">
+		<div class="cl pd-3 bg-1 bk-gray">
+			<div class="option_div">
+				交易活动类型：<select name="bizTypeOptions" id="bizTypeOptions" class="bizType_option option_show" style="margin-right: 25px;"></select>
+			</div>
+			<span class="l" style="margin-top: 10px;margin-bottom: 15px;padding-right: 30px;">
+				<a href="javascript:;" onclick="tenderPlan_select()" class="btn btn-primary radius">确定</a>
+			</span>
+			<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="btn-refresh Hui-iconfont">&#xe68f;</i></a>
+		</div>
+
+		<table id="tenderPlan" class="display" cellspacing="0" width="100%" align="center" style="table-layout:fixed">
+			<thead>
+				<tr>
+					<th style="width:18%;">工作项名称</th>
+					<th style="width:17%;">交易活动类型</th>
+					<th style="width:15%;">计划招标时间</th>
+					<th style="width:15%;">最迟进场时间</th>
+					<th style="width:15%;">招标方式</th>
+					<th style="width:15%;">状态</th>
+					<th style="width:17%;">操作</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	
+	<!-- 右侧页面 -->
+	<div data-options="region:'center'" >
+		<div th:replace="releaseTender/releaseTender-edit::topbar"></div>
+	</div>
+
+
+	<script language="JavaScript">
+	var targetList;
+	var tenderPlanList;
+	
+	$(document).ready(function() {
+		jQuery.ajax({
+            type: "post",
+            url: basePath+"tenderPlan/getBizTypeTenderWayStatusList",
+            dataType: "json",
+            success: function(data){
+              var bizTypeHtml = '<option value="">请选择</option>';
+              var tenderWayHtml = '<option value="">请选择</option>';
+              for(var i=0;i<data.BizType.length;i++){
+           		  bizTypeHtml +='<option value="'+data.BizType[i].enumValue+'">'+data.BizType[i].enumValueName+'</option>';
+              }
+              for(var i=0;i<data.TenderWay.length;i++){
+           		  tenderWayHtml +='<option value="'+data.TenderWay[i].enumValue+'">'+data.TenderWay[i].enumValueName+'</option>';
+              }
+              $('.bizType_option').append(bizTypeHtml);
+              $('.tenderWay_option').append(tenderWayHtml);
+           }
+        });
+		
+		tenderPlanList = $('#tenderPlan').DataTable({
+				ajax : basePath+"tenderPlan/releaseTenderPlan",
+				columns : [{
+					data : "workItemName",
+					"sDefaultContent" : ""
+				}, {
+					data : "bizType.enumValueName",
+					"sDefaultContent" : ""
+				}, {
+					data : "tenderPlanDate",
+					"sDefaultContent" : ""
+				}, {
+					data : "latestMarchinDate",
+					"sDefaultContent" : ""
+				}, {
+					data : "tenderWay.enumValueName",
+					"sDefaultContent" : ""
+				}, {
+					data : "status.enumValueName",
+					"sDefaultContent" : ""
+				}, {
+	                 "sClass": "center",
+	                 "data": null,
+	                 "orderable": false,  
+	                 "render": function (data, type, full, meta) {
+	                	 if(data.status.enumValue==50){
+	                		 return '<a style="text-decoration:none" class="ml-5 a-link" onClick="detail_show_edit('
+			     				+ data.tenderPlanCode+',\''+data.workItemName+'\',\''+data.bizType.enumValue+'\',\''+data.tenderPlanDate+'\',\''+data.latestMarchinDate+'\',\''+data.tenderWay.enumValue+'\','+data.planSupplierNumber+',\''+data.mainContents+'\',\''+data.requirements + '\')" href="javascript:;" title="发布">发布</a>';
+	                	 }else if(data.status.enumValue==56){
+	                		 return '<a style="text-decoration:none" class="ml-5 a-link" onClick="detail_show('
+								+ data.tenderPlanCode+',\''+data.workItemName+'\',\''+data.bizType.enumValue+'\',\''+data.tenderPlanDate+'\',\''+data.latestMarchinDate+'\',\''+data.tenderWay.enumValue+'\','+data.planSupplierNumber+',\''+data.mainContents+'\',\''+data.requirements + '\')" href="javascript:;" title="查看发布信息">查看发布信息</a>';
+	                	 }
+	                	 
+                	 }
+	            }],
+	            select : {
+					style : 'single'
+				},
+				
+				language:{ "sEmptyTable": "数据为空" }
+			});
+			tenderPlanList.on( 'select', function ( e, dt, type, indexes ) {
+				var rowData = tenderPlanList.rows(indexes).data().toArray();
+				detail_show(rowData[0].tenderPlanCode,rowData[0].workItemName,rowData[0].bizType.enumValue,rowData[0].tenderPlanDate,rowData[0].latestMarchinDate,rowData[0].tenderWay.enumValue,rowData[0].planSupplierNumber,rowData[0].mainContents,rowData[0].requirements);
+				/* if(rowData[0].status.enumValue==50){
+					detail_show_edit(rowData[0].tenderPlanCode,rowData[0].workItemName,rowData[0].bizType.enumValue,rowData[0].tenderPlanDate,rowData[0].latestMarchinDate,rowData[0].tenderWay.enumValue,rowData[0].planSupplierNumber,rowData[0].mainContents,rowData[0].requirements);
+				}else{
+					detail_show(rowData[0].tenderPlanCode,rowData[0].workItemName,rowData[0].bizType.enumValue,rowData[0].tenderPlanDate,rowData[0].latestMarchinDate,rowData[0].tenderWay.enumValue,rowData[0].planSupplierNumber,rowData[0].mainContents,rowData[0].requirements);
+				} */
+			});
+			tenderPlanList.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
+		        if ( originalEvent.target.nodeName.toLowerCase() === 'a' ) {
+		            e.preventDefault();
+		        }
+		    });
+	});
+	
+	/* 保存 */
+   $(".release-save").click(function(){
+		$("#operate").val("save");
+		var releaseData = $("#release").bootstrapTable('getData');
+		for (var i = 0; i < releaseData.length; i++) {
+			if (releaseData[i].targetName == '') {
+				layer.msg('第' + (i + 1) + "行目标名称为空", {icon : 1,time : 2000});
+				return;
+			}
+			if (releaseData[i].address == '') {
+				layer.msg('第' + (i + 1) + "行地址为空", {icon : 1,time : 2000});
+				return;
+			}
+			if (releaseData[i].startDate == '') {
+				layer.msg('第' + (i + 1) + "行开始时间为空", {icon : 1,time : 2000});
+				return;
+			}
+			if (releaseData[i].endDate == '') {
+				layer.msg('第' + (i + 1) + "行结束时间为空", {icon : 1,time : 2000});
+				return;
+			}
+		}
+		document.getElementById('JSONText').value = JSON.stringify(releaseData).toString();
+		jQuery.ajax({
+			type : "post",
+			dataType : "json",
+			contentType : 'application/x-www-form-urlencoded;charset=utf-8',
+			url : basePath + "releaseTarget/addOrUpdateTarget",
+			data : $("#releaseTarget").serialize(),
+			success : function(data) {
+				layer.msg(data.retMsg, {icon : 1,time : 1000}, function(){
+					setDataForRelease($("#tenderPlanCode").val());
+				});
+			},
+			error : function(data) {
+				layer.msg('保存出错!', {icon : 1,time : 1000});
+			}
+		});
+	});
+	
+   /* 发布 */
+   $(".release-submit").click(function(){
+		$("#operate").val("submit");
+		var releaseData = $("#release").bootstrapTable('getData');
+		for (var i = 0; i < releaseData.length; i++) {
+			if (releaseData[i].targetName == '') {
+				layer.msg('第' + (i + 1) + "行目标名称为空", {icon : 1,time : 2000});
+				return;
+			}
+			if (releaseData[i].address == '') {
+				layer.msg('第' + (i + 1) + "行地址为空", {icon : 1,time : 2000});
+				return;
+			}
+			if (releaseData[i].startDate == '') {
+				layer.msg('第' + (i + 1) + "行开始时间为空", {icon : 1,time : 2000});
+				return;
+			}
+			if (releaseData[i].endDate == '') {
+				layer.msg('第' + (i + 1) + "行结束时间为空", {icon : 1,time : 2000});
+				return;
+			}
+		}
+		document.getElementById('JSONText').value = JSON.stringify(releaseData).toString();
+		jQuery.ajax({
+			type : "post",
+			dataType : "json",
+			contentType : 'application/x-www-form-urlencoded;charset=utf-8',
+			url : basePath + "releaseTarget/addOrUpdateTarget",
+			data : $("#releaseTarget").serialize(),
+			success : function(data) {
+				layer.msg(data.retMsg, {icon : 1,time : 1000}, function(){
+					$('.btn-refresh').click();
+				});
+			},
+			error : function(data) {
+				layer.msg('发布出错!', {icon : 1,time : 1000});
+			}
+		});
+	});
+   
+   /* 整理保存或者提交的数据 */
+   function releaseFormSubmit(){
+		var dataArray = new Array();
+		var tab = document.getElementById("release_tbody") ; 
+		for(var i=0;i<tab.rows.length-1;i++){
+			var data = new Object();
+			var tr = tab.rows[i];
+			
+			data.targetName = tr.childNodes[0].children.item(0).innerHTML;
+			data.address = tr.childNodes[1].children.item(0).innerHTML;
+			data.startDate  = tr.childNodes[2].children.item(0).innerHTML;
+			data.endDate  = tr.childNodes[3].children.item(0).innerHTML;
+			
+			//将table表对象转换成数组装成json放在数组里
+			dataArray.push(JSON.stringify(data));
+		}
+		//将数组装成json放在数组里
+		document.getElementById('JSONText').value = dataArray.toString(); 
+   }
+	
+	/* 表格的条件查询 */
+	function tenderPlan_select(){
+		var bizTypeOptions = $("#bizTypeOptions").find("option:selected").text();
+		if(bizTypeOptions!="请选择"){
+			tenderPlanList.search(bizTypeOptions).draw();
+		}else{
+			$('.btn-refresh').click();
+		}
+	}
+		
+		/* 初始化表格 */
+	 	targetList = $('#tender_target').DataTable({
+			"searching":false,
+			"info": false,
+			"ordering": false,
+	        "paging": false
+		}); 
+		
+		/* 详细 */
+		function detail_show(tenderPlanCode,workItemName,bizType,tenderPlanDate,latestMarchinDate,tenderWay,planSupplierNumber,mainContents,requirements){
+			$(':input','#releaseTenderInfo').not(':button,:submit,:reset,:hidden').val('');
+			$("#release tbody").html("");
+			if(workItemName!=null)$("#workItemName").val(workItemName);
+			//$("#bizType").find("option:selected").text(bizType);
+			//$("#tenderWay").find("option:selected").text(tenderWay);
+			if (bizType) {
+				$("#bizType").val(bizType);	
+			}
+			if (tenderWay) {
+				$("#tenderWay").val(tenderWay);
+			}
+			document.getElementById("bizType").disabled=true;
+			document.getElementById("bizType").style.background = "#F5F5F5";
+			document.getElementById("tenderWay").disabled=true;
+			document.getElementById("tenderWay").style.background = "#F5F5F5";
+			if(tenderPlanDate!=null)$("#tenderPlanDate").val(tenderPlanDate);
+			if(latestMarchinDate!=null)$("#latestMarchinDate").val(latestMarchinDate);
+			if(planSupplierNumber!=null)$("#planSupplierNumber").val(planSupplierNumber);
+			if(mainContents!=null && mainContents != "undefined")$("#mainContents").val(mainContents);
+			if(requirements!=null && requirements != "undefined")$("#requirements").val(requirements);
+			//editTable("false");
+			document.getElementById("btn_save").style.display="none";
+			document.getElementById("releaseBut").style.display="none";
+			//表格赋值
+			/* jQuery.ajax({
+				type : "post",
+				dataType : "json",
+				url : basePath + "releaseTarget/findReleaseByTenderPlanCode",
+				data : {tenderPlanCode:tenderPlanCode},
+				success : function(data) {
+					
+					var tab = document.getElementById("release") ; 
+					for (var i = 1; i <= data.length; i++) {
+						$("#release_tbody").append('<tr style="height: 30px;"><td><div onblur="check_empty()"></div></td><td><div></div></td>'
+								+'<td><div class="Wdate"  onfocus="WdatePicker({ dateFmt:\'yyyy-MM-dd\'})"></div></td>'
+							 	+'<td><div class="Wdate"  onfocus="WdatePicker({ dateFmt:\'yyyy-MM-dd\'})"></div></td></tr>');
+						var tr = tab.rows[i];
+						tr.cells[0].childNodes[0].innerHTML = data[i-1].targetName;
+						tr.cells[1].childNodes[0].innerHTML = data[i-1].address;
+						if (data[i-1].startDate) {
+							tr.cells[2].childNodes[0].innerHTML = data[i-1].startDate;
+						} else {
+							tr.cells[2].childNodes[0].innerHTML = '';
+						}
+						if (data[i-1].endDate) {
+							tr.cells[3].childNodes[0].innerHTML = data[i-1].endDate;
+						} else {
+							tr.cells[3].childNodes[0].innerHTML = '';
+						}
+				    }
+				}
+			}); */
+			setDataForRelease(tenderPlanCode);
+		}
+		function setDataForRelease(tenderPlanCode) {
+			$('#release').bootstrapTable('destroy');
+			//$.fn.editable.defaults.mode = 'inline';
+			$("#release").bootstrapTable({
+				toolbar: '#toolbar',
+		        method:'POST',
+		        url: basePath+"releaseTarget/findReleaseByTenderPlanCode?tenderPlanCode="+tenderPlanCode,
+		        contentType: "text/html;charset=UTF-8",
+		        cache: false,
+		        striped: true,                       //是否显示行间隔色
+		        sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+		        showColumns:false,
+		        pagination:false,
+		        clickToSelect : true,
+		        onEditableSave: function (field, row, oldValue, $el, index) {
+		        },
+		        onLoadSuccess : function () {
+		        	//如果发布列表为空，默认增加发布目标是施工系统
+					if ($("#release").bootstrapTable('getData').length == 0) {
+						$("#release").bootstrapTable('insertRow', {index:0, 
+				    		   row:{
+				    			   targetCode :  Date.parse(new Date()),
+				    			   targetName : '施工管理系统',
+				    			   address : '/tenderPlan/getTotalReleaseTenderPlan',
+				    			   startDate : '',
+				    			   endDate : ''
+				    		   }
+				    	   });
+					}
+		        },
+		        columns: [{
+	                checkbox : true
+	            }, {
+		            field: 'targetName',
+		            title: '目标名称',
+		            editable: {
+		            	placement : "right"
+		            }
+		        }, {
+		            field: 'address',
+		            title: '地址',
+		            editable: true
+		        },  {
+		            field: 'startDate',
+		            title: '开始时间',
+		            editable : {
+	                    type: 'date',
+	                    title: '开始时间'
+	                },
+		            formatter : function (value,row,index) {
+		            	if (value != undefined) {
+		            		return value;
+		            	} else {
+		            		return '';
+		            	}
+	                }
+		        },  {
+		            field: 'endDate',
+		            title: '结束时间',
+		            editable : {
+	                    type: 'date',
+	                    title: '结束时间'
+	                },
+		            formatter : function (value,row,index) {
+		            	if (value != undefined) {
+		            		return value;
+		            	} else {
+		            		return '';
+		            	}
+	                }
+		        }]
+		    });
+		}
+		/* 编辑 */
+		function detail_show_edit(tenderPlanCode,workItemName,bizType,tenderPlanDate,latestMarchinDate,tenderWay,planSupplierNumber,mainContents,requirements){
+			 $(':input','#releaseTenderInfo').not(':button,:submit,:reset,:hidden').val('');
+			detail_show(tenderPlanCode,workItemName,bizType,tenderPlanDate,latestMarchinDate,tenderWay,planSupplierNumber,mainContents,requirements);
+			/*  $("#release_tbody").html('<tr style="height: 30px;"><td><div onblur="check_empty()"></div></td><td><div></div></td>'
+				+'<td><div class="Wdate"  onfocus="WdatePicker({ dateFmt:\'yyyy-MM-dd\'})"></div></td>'
+			 	+'<td><div class="Wdate"  onfocus="WdatePicker({ dateFmt:\'yyyy-MM-dd\'})"></div></td></tr>');
+			$("#flag").val("I"); */
+			$("#tenderPlanCode").val(tenderPlanCode);
+			document.getElementById("btn_save").style.display="";
+			document.getElementById("releaseBut").style.display="";
+		}
+		/* 设置tbody中的td可编辑 */
+		function editTable(edit){
+			var tb = document.getElementById("release_tbody"); 
+			var rows = tb.rows; 
+			for(var i = 0; i<rows.length; i++ ){
+			   for(var j = 0; j<rows[i].cells.length; j++ ){
+				   if(edit=="true")rows[i].cells[j].children.item(0).contentEditable=true;
+				   if(edit=="false")rows[i].cells[j].children.item(0).contentEditable=false;
+			   }
+			}
+		}
+		
+		/* 可编辑表格（发布目标）行自增 */
+		 function check_empty(){
+			var val = $('#release_tbody tr:last td:first').text();
+			if(val!=""){
+			   $("#release_tbody").append('<tr style="height: 30px;"><td><div onblur="check_empty()"></div></td><td><div></div></td>'
+					+'<td><div class="Wdate date"  onfocus="WdatePicker({ dateFmt:\'yyyy-MM-dd\'})"></div></td>'
+					+'<td><div class="Wdate date"  onfocus="WdatePicker({ dateFmt:\'yyyy-MM-dd\'})"></div></td></tr>');
+			}
+			editTable("true");
+		}
+		//新增发布目标
+		 $("#add-btn").click(function(){
+    	   $("#release").bootstrapTable('insertRow', {index:0, 
+    		   row:{
+    			   targetCode :  Date.parse(new Date()),
+    			   targetName : '',
+    			   address : '',
+    			   startDate : '',
+    			   endDate : ''
+    		   }
+    	   });
+       });
+	   //删除发布目标
+       $("#del-btn").click(function(){
+	    	//已经保存的Id
+	       var saveIds = "";
+    	   var ids = $.map($("#release").bootstrapTable('getSelections'), function (row) {
+    		   if (row.tenderPlanCode) {
+     			   if (saveIds) {
+     				  saveIds += "," + row.targetCode
+     			   } else {
+     				  saveIds = row.targetCode
+     			   }
+     		   }
+               return row.targetCode;
+           });
+           if (ids.length < 1 ) {
+               layer.msg("请选择一行删除!",{icon:1,time:1000});
+               return;
+           }
+           if (saveIds) {
+           		layer.confirm('确认要删除吗？',function(index){
+	       			jQuery.ajax({
+	       				type: "post",
+	                    dataType : "json", 
+	       				url: basePath+"releaseTarget/deleteTarget",
+	       				data : {"targetCodes" : saveIds},
+	       				success: function(data){
+	       					layer.msg('删除成功!',{icon:1,time:1000});
+	       					$("#release").bootstrapTable('remove', {
+	       			            field: 'targetCode',
+	       			            values: ids
+	       			        });
+	       				},
+	       				error:function(data) {
+	       					layer.msg('删除失败!',{icon:1,time:1000});
+	       					console.log(data.msg);
+	       				},
+	       			});		
+	       		});
+           } else {
+           		$("#release").bootstrapTable('remove', {
+                   field: 'targetCode',
+                   values: ids
+               });
+           }
+       });
+	</script>
+<!--/请在上方写此页面业务相关的脚本-->
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script> 
+</body>

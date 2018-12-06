@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+</head>
+<div th:replace="engsafety/hiddenTroubleComm::headBar"></div>
+<body>
+<article class="page-container">
+	<form class="form form-horizontal" id="form-ht-add">
+	<div th:replace="engsafety/hiddenTroubleComm::detailHtt"></div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">审批记录：</label>
+		<div class="formControls col-xs-3 col-sm-9">
+			<table id="approveList" class="ui celled table" cellspacing="0"
+				width="100%" align=center  style="table-layout:fixed">
+				<thead>
+					<tr>
+						<th style="width:22%;text-align:center;">处理名称</th>
+						<th style="width:50%;text-align:center;">处理要求</th>
+						<th style="width:18%;text-align:center;">处理时间</th>
+						<th style="width:10%;text-align:center;">处理人</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+	</form>
+</article>
+
+<script th:inline="javascript">
+$(document).ready(function() {
+	
+	$('#approveList').DataTable({
+		ajax : basePath + "hiddenTrouble/getTroubleTrackList",
+		fnServerParams : function (aoData) {
+			aoData.push(
+				{ name : "troubleCode", value : $("#troubleCode").val()}
+			);
+		},
+		"ordering": false,
+		columns : [{
+			data : "name"
+		}, {
+			data : "claim",
+			"sDefaultContent" : ""
+		}, {
+			data : "dealtime",
+			"sDefaultContent" : ""
+		}, {
+			data : "dealername",
+			"sDefaultContent" : ""
+		}]
+	});
+});
+
+</script> 
+</body>
+</html>

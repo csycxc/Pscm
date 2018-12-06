@@ -1,0 +1,8 @@
+#box{position:absolute;float:left;height:100%;width:100%;margin:0px auto;}
+#leftdiv{position:absolute;float:left;height:100%;width:20%;left:0px;border: solid 0px #ccc;}
+#rightdiv{position:absolute;float:left;height:100%;width:80%;right:0px;border: solid 0px #ccc;}
+#line{position:absolute;float:left;height:100%;width:1px;left:20%;background:white;cursor:col-resize;z-index:1;}
+/*
+min-width:15%;
+max-width:85%;
+*/

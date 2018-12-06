@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+</head>
+<body>
+<article class="page-container">
+<div th:fragment="topbar">
+	<form class="form form-horizontal" id="tenderPlanInfo" name="tenderPlanInfo" >
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>工作项名称:</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="hidden" name="supplierJson" id="supplierJson">
+				<input type="hidden" name="flag" id="flag" value="">
+				<input type="hidden" name="tenderPlanCode" id="tenderPlanCode" value="">
+				<input type="text" value="" placeholder="" id="workItemName" name="workItemName" class="input-text">
+			</div>
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>交易活动类型:</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<select name="bizType.enumValue" id="bizType" class="bizType_option option_show"></select>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>招标方式:</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<select name="tenderWay.enumValue" id="tenderWay" class="tenderWay_option option_show"></select>
+			</div>
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>拟定供方数量:</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="number" value="" placeholder="" id="planSupplierNumber" name="planSupplierNumber" class="input-text">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>计划招标时间:</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="text"  value="" onfocus="WdatePicker({ dateFmt:'yyyy-MM-dd'})" placeholder="" id="tenderPlanDate" name="tenderPlanDate" class="input-text Wdate">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>最迟进场时间:</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="text"  value="" onfocus="WdatePicker({ dateFmt:'yyyy-MM-dd'})" placeholder="" id="latestMarchinDate" name="latestMarchinDate" class="input-text Wdate">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">招标主要内容:</label>
+			<div class="formControls col-xs-3 col-sm-10">
+				<textarea class="input-text" id="mainContents" name="mainContents" style="height: 80px;"></textarea>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">招标要求:</label>
+			<div class="formControls col-xs-3 col-sm-10">
+				<textarea class="input-text" id="requirements" name="requirements" style="height: 80px;"></textarea>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3">供方信息:</label>
+			<div style="float:right;margin:10px 0px 10px 5px;display: none;" id="supBut">
+				<button type="button" class="btn btn-default" id="add-btn" title="增加">
+					<span style="color:#008000;background-color:#efefef;font-weight:bold;"></span>
+					<span class="glyphicon glyphicon-plus"></span>
+				</button>
+				<button type="button" class="btn btn-default" id="del-btn" title="删除">
+					<span style="color:#008000;background-color:#efefef;font-weight:bold;"></span>
+					<span class="glyphicon glyphicon-trash"></span>
+				</button>
+			</div>
+			<table id="supplier" class="table table-bordered table-striped" width="100%">
+				<tr>
+	                <th data-field="state" data-checkbox="true"></th>
+	                <th data-field="supplierName">单位名称</th>
+	                <th data-field="contactMan">联系人</th>
+	                <th data-field="contactTel">联系电话</th>
+	            </tr>
+			</table>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3">审批记录:</label>
+			<table id="approval" class="ui celled table" cellspacing="0"
+				width="100%" align=center  style="table-layout:fixed">
+				<thead>
+					<tr>
+						<th style="width:22%;text-align:center;">处理名称</th>
+						<th style="width:50%;text-align:center;">处理要求</th>
+						<th style="width:18%;text-align:center;">处理时间</th>
+						<th style="width:10%;text-align:center;">处理人</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<div class="row cl" id="btn_save" style="display: none;">
+			<div class="col-xs-3 col-sm-9 col-xs-offset-3 col-sm-offset-2">
+				<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;保存&nbsp;&nbsp;">
+			</div>
+		</div>
+	</form>
+</div>
+</article>
+<script type="text/javascript">
+supplierList = $('#supplier').DataTable({
+	"searching":false,
+	"info": false,
+	"ordering": false,
+    "paging": false,
+    language:{ "sEmptyTable": "数据为空" }
+});
+approvalList = $('#approval').DataTable({
+	"searching":false,
+	"info": false,
+	"ordering": false,
+    "paging": false,
+    language:{ "sEmptyTable": "数据为空"}
+});
+
+</script>
+</body>
+</html>

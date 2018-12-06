@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+</head>
+<div th:replace="engsafety/hiddenTroubleComm::headBar"></div>
+<body>
+<article class="page-container">
+	<form class="form form-horizontal" id="form-ht-add">
+	<div th:replace="engsafety/hiddenTroubleComm::detailHtt"></div>
+	<div class="row cl">
+		<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>整改措施：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<textarea class="input-text" id="p_S_rectifysteps" name="p_S_rectifysteps" style="height:50px;"></textarea>
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-4 col-sm-2">审批意见：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<textarea class="input-text" id="p_S_claim" name="p_S_claim" style="height:50px;"></textarea>
+		</div>
+	</div>
+	<div class="row cl">
+		<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+			<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;整改&nbsp;&nbsp;">
+		</div>
+	</div>
+	</form>
+</article>
+
+<script th:inline="javascript">
+$(document).ready(function() {
+	$("#form-ht-add").validate({
+		rules:{
+			p_S_rectifysteps:{
+				required:true,
+				maxlength:1000
+			}
+		},
+		onkeyup:false,
+		focusCleanup:true,
+		success:"valid",
+		submitHandler:function(form){
+			$(form).ajaxSubmit({
+				cache: true,
+                type: "POST",
+                data : {flag:'rectify'},
+				url: basePath + "hiddenTrouble/task/complete/" + [[${task.id}]],
+				async: false,
+				//contentType : "application/x-www-form-urlencoded",
+				success: function(data){
+					if (data.result == true) {
+						layer.msg('整改成功!',{icon:1,time:1000}, function(){
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.$('.btn-refresh').click();
+							parent.layer.close(index);
+						});
+					} else {
+						layer.msg(data.retMsg,{icon:1,time:1000})
+					}
+				},
+                error: function(XmlHttpRequest, textStatus, errorThrown){
+					layer.msg('整改失败!',{icon:1,time:1000});
+				}
+			});
+		}
+	});
+});
+
+</script> 
+<div th:replace="engsafety/hiddenTroubleComm::footerBar"></div>
+</body>
+</html>

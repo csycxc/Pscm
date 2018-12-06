@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link th:href="@{/css/jquery.dataTables.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/semantic.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/dataTables.semanticui.min.css}"
+	rel="stylesheet" type="text/css" />
+
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/semantic.min.js}"></script>
+	
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>	
+<style>
+.page-container{
+ padding: 1px 5px 5px 5px;
+}
+</style>
+</head>
+<body >
+	<div class="page-container">
+		<div class="cl pd-3 bg-1 bk-gray">
+			<span class="l"><!-- a href="javascript:;" onclick="datadel()"
+				class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i>
+					批量删除</a--> <a href="javascript:;"
+				th:onclick="'role_add(\'添加角色\',\'' + @{/role/edit}  + '\',\'800\',\'500\')'"
+				class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i>
+					添加角色</a></span>
+				<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="btn-refresh Hui-iconfont">&#xe68f;</i></a>
+		</div>
+
+
+
+		<table id="user" class="ui celled table" cellspacing="0"
+			width="100%" align=center>
+			<thead>
+				<tr>
+					<!-- <th style="display: none;"><input type="checkbox" class="checkall" /></th> -->
+					<th>角色编码</th>
+					<th>租户编码</th>
+					<th>部门编码</th>
+					<th>角色名称</th>
+					<th width="30" align="center">操作</th>
+				</tr>
+			</thead>
+		</table>
+
+	</div>
+	<script th:inline="javascript">
+/* {
+    "sClass": "center",
+    "render": function (data, type, full, meta) {
+        return '<input type="checkbox"  class="checkchild"  value="' + data + '" />';
+    },
+    "bSortable": false
+},  */
+		$(document).ready(function() {
+			$('#user').DataTable({
+				ajax : /*[[@{/role/getRoleList}]]*/,
+				columns : [{
+					data : "roleCode",
+					"sDefaultContent" : ""
+				}, {
+					data : "tenantCode",
+					"sDefaultContent" : ""
+				}, {
+					data : "deptCode",
+					"sDefaultContent" : ""
+				}, {
+					data : "name",
+					"sDefaultContent" : ""
+				}, /*{
+					data : "status",
+					"render": function (data, type, full, meta) {
+						if (data = "1") {
+							return '可用';
+						} else {
+							return '停用';
+						}
+					}
+				} , */{
+	                 "sClass": "center",
+	                 "data": null,
+	                 "orderable": false,  
+	                 "render": function (data, type, full, meta) {
+	                     return '<a style="text-decoration:none" class="ml-5" onClick="role_add(\'修改角色\',\'' +/*[[@{/role/edit?roleCode=}]]*/		 
+	                    		 + data.roleCode + '\',\'800\',\'500\')" href="javascript:;" title="编辑">'
+	                     		 +'<i class="Hui-iconfont">&#xe6df;</i></a> <a style="text-decoration:none" class="ml-5" onClick="role_del(this,\'' + data.roleCode + '\')" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>';
+	                 }
+	            }],
+	            "aoColumnDefs": [
+	          	  //{"bVisible": false, "aTargets": [ 3 ]} //控制列的隐藏显示
+	          	  {"orderable":false,"aTargets":[4]}// 不参与排序的列
+	          	]
+	            /* "aoColumnDefs": [
+            	{ "bSearchable": false, "bVisible": false, "aTargets": [ 2 ] },
+            	{ "bVisible": false, "aTargets": [ 3 ] }
+            	], */
+            	//"bStateSave": true,
+			});
+		});
+		
+		
+		/*角色-添加*/
+		function role_add(title,url,w,h){
+			var index = layer.open({
+				type: 2,
+				title: title,
+				content: url
+			});
+			layer.full(index);
+		}
+		/*角色-编辑*/
+		function role_edit(title,url,id,w,h){
+			var index = layer.open({
+				type: 2,
+				title: title,
+				content: url
+			});
+			layer.full(index);
+		}
+		/*角色-删除*/
+		function role_del(obj,id){
+			layer.confirm('确认要删除吗？',function(index){
+				jQuery.ajax({
+					type : 'POST',
+					url : /*[[@{/role/deleteRole}]]*/,
+					data : {"roleCode" : id},
+					//dataType: 'json',
+					success: function(data){
+						$(obj).parents("tr").remove();
+						layer.msg('删除成功!',{icon:1,time:1000});
+					},
+					error:function(data) {
+						layer.msg('删除失败!',{icon:1,time:1000});
+						console.log(data.msg);
+					},
+				});		
+			});
+		}
+	</script>
+
+</body>

@@ -1,0 +1,207 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+	<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+</head>
+<body>
+<article class="page-container">
+<!-- 培训记录 -->
+<div th:fragment="trainframe">
+	<p><font color="#FF0000">培训记录</font></p>
+	<form class="form form-horizontal" id="trainForm" name="trainForm">
+	<!--培训记录详细信息（添加、修改）-->
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">培训编号：</label>
+		<div class="formControls col-xs-3 col-sm-4">
+			<input type="text" class="input-text" id="trainCode" name="trainCode" value="" readonly="readonly">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2">合同名称：</label>
+		<div class="formControls col-xs-3 col-sm-4">
+			<input type="text" class="input-text" id="contractName" name="contractName" value="" readonly="readonly">
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">合同乙方：</label>
+		<div class="formControls col-xs-3 col-sm-4">
+			<input type="text" class="input-text" id="contractPartSecond" name="contractPartSecond" value="" readonly="readonly">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2">作业队：</label>
+		<div class="formControls col-xs-3 col-sm-4">
+			<!--<input type="text" class="input-text" id="traininId" name="traininId" value="" style="display:none;">-->
+			<input type="text" class="input-text" id="constructionTeam" name="constructionTeam" value="">
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">培训人：</label>
+		<div class="formControls col-xs-3 col-sm-4">
+			<input type="text" class="input-text" id="trainer" name="trainer" value="">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2">培训时间：</label>
+		<div class="formControls col-xs-3 col-sm-4">
+			<input type="text" value="" onfocus="WdatePicker({ dateFmt:'yyyy-MM-dd'})" placeholder="" required="required" id="trianDate" name="trianDate" class="input-text Wdate">
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">培训地点：</label>
+		<div class="formControls col-xs-3 col-sm-10">
+			<textarea class="input-text" id="trainAddress" name="trainAddress" style="height:60px;"></textarea>
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">培训内容：</label>
+		<div class="formControls col-xs-3 col-sm-10">
+			<textarea class="input-text" id="trainConntent" name="trainConntent" style="height:60px;"></textarea>
+		</div>
+	</div>
+	<div class="row cl"><!--display: none;-->
+		<div class="col-xs-3 col-sm-1" style="margin-left: 100px;">
+			<input class="btn btn-primary radius" type="button" id="save_trainForm" value="保存">
+		</div>
+		<div class="col-xs-3 col-sm-1" style="margin-left: 100px;">
+			<input class="btn btn-primary radius" type="button" id="reset_trainForm" value="重置">
+		</div>
+	</div>
+</form>
+</div>
+<div th:fragment="attachmentframe" style="margin-top: 10px;">
+	<div style="width: 100%">
+		<label for="train-attachment">附件:</label>
+		<button class="btn btn-default btn-upload" style="float: right;">上传附件</button>
+	</div>
+	<table id="train-attachment" cellspacing="0" border="1" class="ui celled table" width="100%" align=center>
+		<thead><tr><th>文件名</th><th>类型</th><th>操作</th></tr></thead>
+		<tbody></tbody>
+	</table>
+</div>
+<!-- 培训人员 -->
+<div th:fragment="laborframe" style="margin-top: 10px;"> <!--人员信息-->
+	<p><font color="#FF0000">人员信息</font></p>
+	<form class="form form-horizontal" id="laborForm" name="laborForm" >
+		<!--劳务人员详细信息（添加、修改）-->
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">培训编号：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="text" class="input-text" id="laborForm-trainCode" name="laborForm-trainCode" value="" readonly="readonly">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>身份证号：</label>
+			<div class="formControls col-xs-3 col-sm-6">
+				<input type="text" class="input-text" id="idNumber" name="idNumber" value="">
+			</div>
+			<span class="formControls col-xs-3 col-sm-4" >
+				<a href="javascript:;" id="labor_select" class="btn btn-primary radius">(添加)查询</a>
+			</span>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">平安卡号：</label>
+			<div class="formControls col-xs-3 col-sm-6">
+				<input type="text" class="input-text" id="inId" name="inId" value="" readonly="readonly">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">姓名：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="text" class="input-text" id="name" name="name" value="">
+			</div>
+			<label class="form-label col-xs-3 col-sm-2">性别：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="radio" name="sex" value="1"  checked="checked" title="男" >男
+				<input type="radio" name="sex" value="0" title="女">女
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">身高：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="text" class="input-text" id="height" name="height" value="">
+			</div>
+			<label class="form-label col-xs-3 col-sm-2">体重：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="text" class="input-text" id="weigh" name="weigh" value="">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">出生年月：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="text" class="input-text Wdate" id="birthday" name="birthday" value="" onfocus="WdatePicker({ dateFmt:'yyyy-MM-dd'})" placeholder="">
+			</div>
+			<label class="form-label col-xs-3 col-sm-2">文化程度：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="text" class="input-text" id="educationDegree" name="educationDegree" value="">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">工种：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="text" class="input-text" id="workerType" name="workerType" value="">
+			</div>
+			<label class="form-label col-xs-3 col-sm-2">入场时间：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="text" class="input-text" id="inDate" name="inDate" value="" readonly="readonly">
+				<!--<input type="text" class="input-text Wdate" id="inDate" name="inDate" value="" onfocus="WdatePicker({ dateFmt:'yyyy-MM-dd'})" placeholder="">-->
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">家庭住址：</label>
+			<div class="formControls col-xs-3 col-sm-10">
+				<input type="text" class="input-text" id="address" name="address" value="">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">考试成绩：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<input type="text" class="input-text" id="examScore" name="examScore" value="">
+			</div>
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>工资模式：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<select name="wageModel" id="wageModel" class="wage_model_option option_show"
+						style="margin-right: 25px;width: 100px;" value=""></select>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>工资单价：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<select name="wageUnitPrice" id="wageUnitPrice" class="wage_unit_price_option option_show"
+						style="margin-right: 25px;width: 100px;" value=""></select>
+			</div>
+			<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>工资单位：</label>
+			<div class="formControls col-xs-3 col-sm-4">
+				<select name="wageUmint" id="wageUmint" class="wage_umint_option option_show"
+						style="margin-right: 25px;width: 100px;" value=""></select>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">身份证照片：</label>
+			<input type="file" id="idPhoto" accept="image/*" >	<!--multiple="multiple" 多张-->
+			<img src="" id="idPhotoImg" height="100" width="100" onclick="lookimg(this.src)">
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3 col-sm-2">入场手持照片：</label>
+			<input type="file" id="inIdPhoto" accept="image/*">
+			<img src="" id="inIdPhotoImg" height="100" width="100" onclick="lookimg(this.src)">
+		</div>
+		<div class="row cl"><!--display: none;-->
+			<div class="col-xs-3 col-sm-1" style="margin-left: 100px;">
+				<input class="btn btn-primary radius" type="button" id="sava_laborForm" value="保存">
+			</div>
+			<div class="col-xs-3 col-sm-1" style="margin-left: 100px;">
+				<input class="btn btn-primary radius" type="button" id="reset_laborForm" value="重置">
+			</div>
+		</div>
+	</form>
+</div>
+</article>
+</body>
+<script th:inline="javascript">
+    attachmentList = $("#train-attachment").DataTable({
+        "searching":false,
+        "paging": false,
+        language:{ "sEmptyTable": "数据为空" }
+    });
+</script>
+</html>

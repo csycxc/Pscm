@@ -1,0 +1,284 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link th:href="@{/css/jquery.dataTables.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/semantic.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/dataTables.semanticui.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/select.dataTables.min.css}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" th:href="@{/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css}" type="text/css">
+	
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+
+<script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript" th:src="@{/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/zTree/v3/api/apiCss/jquery.ztree.core-3.5.js}"></script>
+<script type="text/javascript" th:src="@{/lib/zTree/v3/js/jquery.ztree.excheck-3.5.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/dataTables.select.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>	
+<style>
+.page-container{
+ padding: 1px 5px 5px 5px;
+}
+</style>
+</head>
+<body >
+	<div class="page-container">
+		<div class="cl pd-3 bg-1 bk-gray">
+			<span class="l">
+			<!-- a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i>批量删除</a--> 
+			<a href="javascript:;" onclick="saveRoleResAndRoleEngs()" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i>保存</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="btn-refresh Hui-iconfont">&#xe68f;</i></a>
+		</div>
+		<div style="float:left;border:1px width:50%; padding-left: 5px">
+			<table id="role" class="display" cellspacing="0" width="500px" align=center>
+				<thead><tr><th>角色编码</th><th>角色名称</th></tr></thead>
+			</table>
+		</div>
+		<div style="border:0px width:100%; padding-left: 5px">
+	        <div style="height:600px;overflow:scroll;border:solid 1px #ccc;float:left">
+				<h4>系统模块</h4><!--第一个树，显示	模块	-->
+	        	<ul id="treeDemo1" class="ztree"></ul> 
+        	</div>
+        	<div style="height:600px;overflow:scroll;border:solid 1px #ccc;float:left">
+	        	<h4>工程划分</h4><!--第三个树，显示	划分	-->
+	         	<ul id="treeDemo2" class="ztree"></ul>
+        	</div>
+        	<div style="height:600px;overflow:scroll;border:solid 1px #ccc;float:left">  
+	        	<h4>操作模块</h4><!--第二个树，显示	模块	-->
+	        	<ul id="treeDemo3" class="ztree"></ul>  
+	        </div> 
+		</div>
+	</div>
+	<script th:inline="javascript">
+		var basePath = /*[[@{/}]]*/;  
+		var staticRoleCode;
+		staticRoleCode = "";
+        var setting = {  
+            check: {  
+                enable: true,  
+                nocheckInherit: false,
+                chkStyle: "checkbox"
+            },  
+            data: {  
+                simpleData: {  
+                    enable: true  
+                }  
+            }  
+        };  
+        //ztree用于初始化的静态数据          
+        var zNodes = [  
+            { id: 1, pId: 0, name: "随意勾选 1" },  
+            { id: 11, pId: 1, name: "随意勾选 1-1" },  
+            { id: 111, pId: 11, name: "无 checkbox 1-1-1" },  
+            { id: 112, pId: 11, name: "随意勾选 1-1-2" },  
+            { id: 12, pId: 1, name: "无 checkbox 1-2" },  
+            { id: 2, pId: 0, name: "随意勾选 2" },  
+        ];  
+  
+        //过滤节点的机制 直接return node表示不做任何过滤  
+        function filter(node) {  
+            return node;  
+        }  
+  
+        ///动态设置zTree的所有节点有checkbox  
+        function DynamicUpdateNodeCheck() {  
+        	var zTree1 = jQuery.fn.zTree.getZTreeObj("treeDemo1");  
+            var zTree2 = jQuery.fn.zTree.getZTreeObj("treeDemo2");  
+            var zTree3 = jQuery.fn.zTree.getZTreeObj("treeDemo3");  
+            //根据过滤机制获得zTree的所有节点              
+            var nodes1 = zTree1.getNodesByFilter(filter);  
+            var nodes2 = zTree2.getNodesByFilter(filter);
+            var nodes3 = zTree3.getNodesByFilter(filter);
+            //遍历每一个节点然后动态更新nocheck属性值  
+            for (var i = 0; i < nodes1.length; i++) {  
+                var node = nodes1[i];  
+                node.nocheck = false; //表示显示checkbox  
+                zTree1.updateNode(node);  
+            }
+            for (var i = 0; i < nodes2.length; i++) {  
+                var node = nodes2[i];  
+                node.nocheck = false; //表示显示checkbox  
+                zTree2.updateNode(node);  
+            } 
+            for (var i = 0; i < nodes3.length; i++) {  
+                var node = nodes3[i];  
+                node.nocheck = false; //表示显示checkbox  
+                zTree3.updateNode(node);  
+            }  
+        }  
+  
+        
+        $(document).ready(function() {
+			var roleTable = $('#role').DataTable({
+				ajax : basePath + "role/getRoleList",
+				columns : [{
+					data : "roleCode"
+				}, {
+					data : "name",
+					"sDefaultContent" : ""
+	            }],
+				select: {
+		            style: 'single'
+		        }
+			});
+			roleTable.on( 'select', function ( e, dt, type, indexes ) {
+	            var rowData = roleTable.rows( indexes ).data().toArray();
+	            staticRoleCode = rowData[0].roleCode
+	            jQuery.ajax({
+					type : 'POST',
+					url : basePath + 'role/findRoleResAndEngs',
+					data : {"roleCode" : staticRoleCode},
+					dataType: 'json',
+					success: function(data){
+						CancelAllNodes();
+						if(data) {
+							/* 这里是全局模块和管理模块 */
+							data1 = data.res;
+							if(data1) {
+								for (var i = 0; i < data1.length; i++) {
+									var d = data1[i];
+									if(d.resourceCode.startsWith("1")){
+										menuTree1.checkNode(menuTree1.getNodeByParam("id", d.resourceCode, null), true, false);
+									}else{
+										menuTree3.checkNode(menuTree3.getNodeByParam("id", d.resourceCode, null), true, false);
+									}
+								}
+							}
+							/* 这里 是 划分模块 */
+							data2 = data.div;
+							if(data2) {
+								for (var i = 0; i < data2.length; i++) {
+									var d = data2[i];
+									menuTree2.checkNode(menuTree2.getNodeByParam("id", d.divisionSnCode, null), true, false);
+								}
+							}
+						}
+					},
+					error:function(data) {
+						
+					}
+				});	
+	            //events.prepend( '<div><b>'+type+' selection</b> - '+JSON.stringify( rowData )+'</div>' );
+	        })
+	        .on( 'deselect', function ( e, dt, type, indexes ) {
+	        	staticRoleCode = "";
+	        	CancelAllNodes();
+	        });
+			 /* =================== 三个树的初始数据  （后台传过来的menuNode1,menuNode2,menuNode3） ==================== */
+        	var menu1 = $("#treeDemo1");
+			menu1 = jQuery.fn.zTree.init(menu1, setting, /*[[${menuNode1}]]*/);//系统
+			var menuTree1 = jQuery.fn.zTree.getZTreeObj("treeDemo1");
+			
+			var menu2 = $("#treeDemo2");
+			menu2 = jQuery.fn.zTree.init(menu2, setting, /*[[${menuNode2}]]*/);//划分
+			var menuTree2 = jQuery.fn.zTree.getZTreeObj("treeDemo2");
+			
+			var menu3 = $("#treeDemo3");
+			menu3 = jQuery.fn.zTree.init(menu3, setting, /*[[${menuNode3}]]*/);//操作
+			var menuTree3 = jQuery.fn.zTree.getZTreeObj("treeDemo3");
+		});
+        
+        //全选
+        function CheckAllNodes() {
+        	 var treeObj1 = jQuery.fn.zTree.getZTreeObj("treeDemo1");
+             var treeObj2 = jQuery.fn.zTree.getZTreeObj("treeDemo2");
+             var treeObj3 = jQuery.fn.zTree.getZTreeObj("treeDemo3");
+             treeObj1.checkAllNodes(true);
+             treeObj2.checkAllNodes(true);
+             treeObj3.checkAllNodes(true);
+        }
+
+        //全取消
+        function CancelAllNodes() {
+        	var treeObj1 = jQuery.fn.zTree.getZTreeObj("treeDemo1");
+            var treeObj2 = jQuery.fn.zTree.getZTreeObj("treeDemo2");
+            var treeObj3 = jQuery.fn.zTree.getZTreeObj("treeDemo3");
+            treeObj1.checkAllNodes(false);
+            treeObj2.checkAllNodes(false);
+            treeObj3.checkAllNodes(false);
+        }
+
+        /*角色-模块-划分=====的保存*/
+		function saveRoleResAndRoleEngs() {
+			var treeObj1 = jQuery.fn.zTree.getZTreeObj("treeDemo1");
+			var treeObj2 = jQuery.fn.zTree.getZTreeObj("treeDemo2");//划分
+			var treeObj3 = jQuery.fn.zTree.getZTreeObj("treeDemo3");
+			var nodes1 = treeObj1.getCheckedNodes();
+			var nodes2 = treeObj2.getCheckedNodes();//划分
+			var nodes3 = treeObj3.getCheckedNodes();
+			if (staticRoleCode == "") {
+				layer.msg('请先选择一条角色!',{icon:1,time:1000});
+				return;
+			}
+			if (nodes1.length > 0 || nodes2.length > 0 || nodes3.length > 0) {
+				var ids1 = "",ids2 = "";//ids1是模块ids2是划分
+				if(nodes1.length > 0){
+					for (var i=0; i < nodes1.length; i++) {
+						var node = nodes1[i]
+						if (ids1 == "") {
+							ids1 = node.id;
+						} else {
+							ids1 += "," + node.id;
+						}
+					}
+				}
+				if(nodes3.length > 0){
+					for (var i=0; i < nodes3.length; i++) {
+						var node = nodes3[i]
+						if (ids1 == "") {
+							ids1 = node.id;
+						} else {
+							ids1 += "," + node.id;
+						}
+					}
+				}
+				if(nodes2.length > 0){
+					for (var i=0; i < nodes2.length; i++) {
+						var node = nodes2[i]
+						if (ids2 == "") {
+							ids2 = node.id;
+						} else {
+							ids2 += "," + node.id;
+						}
+					}
+				}
+				jQuery.ajax({
+					type : 'POST',
+					url : basePath + 'role/saveRoleResAndEngs',
+					data : {"roleCode" : staticRoleCode, "ids1" : ids1,"ids2" : ids2},
+					//dataType: 'json',
+					success: function(data){
+						layer.msg('保存成功!',{icon:1,time:1000});
+					},
+					error:function(data) {
+						layer.msg('保存失败!',{icon:1,time:1000});
+					}
+				});	
+			}else{
+				//什么权限都没有，删除
+				jQuery.ajax({
+					type : 'POST',
+					url : basePath + 'role/delRoleResAndEngs',
+					data : {"roleCode" : staticRoleCode},
+					//dataType: 'json',
+					success: function(data){
+						layer.msg('删除成功!',{icon:1,time:1000});
+					},
+					error:function(data) {
+						layer.msg('删除失败!',{icon:1,time:1000});
+					}
+				});
+			}
+			//history.go(0);//保存后刷新一下勾选项，变为空白
+		}
+	</script>
+</body>

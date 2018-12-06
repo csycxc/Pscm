@@ -1,0 +1,234 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link th:href="@{/css/jquery.dataTables.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/semantic.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/dataTables.semanticui.min.css}"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/lib/lightbox2/2.8.1/css/lightbox.css}" rel="stylesheet" type="text/css" >
+
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/webuploader/0.1.5/webuploader.css}" />
+
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery.formHelp.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/semantic.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+<script type="text/javascript" th:src="@{/lib/webuploader/0.1.5/webuploader.min.js}"></script>
+<title>进度填报</title>
+</head>
+<body>
+<article class="page-container">
+	<form class="form form-horizontal" id="form-ht-add">
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">划分位置：</label>
+		<div class="formControls col-xs-3 col-sm-6">
+			<input class="input-text" th:value="${takeplace}" id="divwhere" name="divwhere" readonly="readonly" style="height:30px;"></input>
+		</div>
+	</div>
+	<div class="row cl" style="display: none">
+		<label class="form-label col-xs-3 col-sm-2">划分序号：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input type="text"  th:value="${r!=null}?${r.divisionsncode}" id="divisionsncode" name="divisionsncode" readonly="readonly" class="input-text">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2">工程划分名称：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input type="text"  th:value="${r!=null}?${r.divname}" readonly="readonly" id="divname" name="divname" class="input-text">
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">计划开工日期：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input type="text"  th:value="${r!=null}?${r.startDate}" id="startDate" name="startDate" readonly="readonly" class="input-text Wdate">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2">计划完工日期：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input type="text"  th:value="${r!=null}?${r.endDate}" readonly="readonly" id="endDate" name="endDate" class="input-text Wdate">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2">计划天数：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input class="input-text" th:value="${r!=null}?${r.planToady}" id="planToady" name="planToady" readonly="readonly">
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">实际开工日期：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input type="text"  th:value="${r!=null&&r.actualStartDate!=null}?${r.actualStartDate}" id="actualStartDate" name="actualStartDate" th:readonly="${r!=null&&r.actualStartDate!=null}"  th:attr="onfocus=${r!=null&&r.actualStartDate==null}?'WdatePicker({ dateFmt:\'yyyy-MM-dd\'})'" class="input-text Wdate">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2">实际完工日期：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input type="text"  th:value="${r!=null&&r.actualEndDate!=null}?${r.actualEndDate}" readonly="readonly" id="actualEndDate" name="actualEndDate" class="input-text Wdate">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2">实际施工天数：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input class="input-text" th:value="${r!=null&&r.actualConstDays!=null}?${r.actualConstDays}" id="actualConstDays" name="actualConstDays" readonly="readonly">
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">累计完成数量：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input class="input-text" th:value="${r!=null}?${r.completedQuantity}" id="completedQuantity" name="completedQuantity" readonly="readonly">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2">施工方案工程总量：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input class="input-text" th:value="${r!=null&&r.consSchemeQuantity!=null}?${r.consSchemeQuantity}" id="consSchemeQuantity" name="consSchemeQuantity" readonly="readonly">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2">工程设计数量：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input class="input-text" th:value="${r!=null&&r.designQuantity!=null}?${r.designQuantity}" id="designQuantity" name="designQuantity" readonly="readonly">
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>完成数量：</label>
+		<div class="formControls col-xs-3 col-sm-2">
+			<input class="input-text" value="" id="finishNumber" name="finishNumber" type="number">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2">完成位置：</label>
+		<div class="formControls col-xs-3 col-sm-6">
+			<textarea class="input-text" id="finishWhere" name="finishWhere" style="height:30px;"></textarea>
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">说明：</label>
+		<div class="formControls col-xs-3 col-sm-10">
+			<textarea class="input-text" id="description" name="description" style="height:60px;"></textarea>
+		</div>
+	</div>
+	<div class="row cl">
+		<div class="col-xs-3 col-sm-2 col-xs-offset-3 col-sm-offset-2">
+			<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;上报&nbsp;&nbsp;">
+		</div>
+	</div>
+	</form>
+</article>
+
+<script th:inline="javascript">
+var basePath = /*[[@{/}]]*/; 
+$(document).ready(function() {
+	if ([[${retMsg}]] != '') {
+		layer.msg([[${retMsg}]],{icon:1,time:3000});
+	}
+	$("#form-ht-add").validate({
+		rules:{
+			divisionsncode:{
+				required:true
+			},
+			workdate:{
+				required:true
+			},
+			finishWhere:{
+				maxlength:100
+			},
+			description:{
+				maxlength:100
+			},
+			finishNumber:{
+				required:true,
+				isIntGtZero:true
+			}
+		},
+		onkeyup:false,
+		focusCleanup:true,
+		success:"valid",
+		submitHandler:function(form){
+			$(form).ajaxSubmit({
+				cache: true,
+                type: "POST",
+				url: basePath + "techDisclosure/saveEngDivFinishRate",
+				data: $("#form-ht-add").serialize(),
+				async: false,
+				//contentType : "application/x-www-form-urlencoded",
+				success: function(data){
+					if (data.result == true) {
+						layer.msg('保存成功!',{icon:1,time:1000}, function(){
+							
+						});
+					} else {
+						layer.msg(data.retMsg,{icon:1,time:3000})
+					}
+				},
+                error: function(XmlHttpRequest, textStatus, errorThrown){
+					layer.msg('保存失败!',{icon:1,time:1000});
+				}
+			});
+		}
+	});
+});
+
+function setData(d) {
+	jQuery.ajax({
+		type : 'POST',
+		url : basePath + 'techDisclosure/getEngDivFinishRate?divSnCode=' + d,
+		dataType: 'json',
+		success: function(data){
+			if(data.retMsg == ""){
+				$("#form-ht-add").setForm(data.r);
+				if (data.r.startDate) {
+					$("#startDate").val(data.r.startDate.substr(0,10));
+				} else {
+					$("#startDate").val('');
+				}
+				if (data.r.endDate) {
+					$("#endDate").val(data.r.endDate.substr(0,10));
+				} else {
+					$("#endDate").val('');
+				}
+				if (data.r.actualStartDate) {
+					$("#actualStartDate").val(data.r.actualStartDate.substr(0,10));
+					$("#actualStartDate").attr("readonly", "readonly");
+					$("#actualStartDate").attr("disabled", "disabled");
+				} else {
+					$("#actualStartDate").val('');
+					$("#actualStartDate").removeAttr("readonly");
+					$("#actualStartDate").removeAttr("disabled");
+					$("#actualStartDate").attr("onfocus", "WdatePicker({ dateFmt:'yyyy-MM-dd'})");
+				}
+				if (data.r.actualEndDate) {
+					$("#actualEndDate").val(data.r.actualEndDate.substr(0,10));
+				} else {
+					$("#actualEndDate").val('');
+				}
+				$('#finishNumber').focus();
+				if(data.takeplace){
+					$("#divwhere").val(data.takeplace);
+					$("#divwhere").removeAttr("readonly");
+					$("#divwhere").removeAttr("disabled");
+				}else{
+					$("#divwhere").val('');
+					$("#divwhere").removeAttr("readonly");
+					$("#divwhere").removeAttr("disabled");
+				}
+			} else {
+				$("input[type!='submit']").val("");
+				layer.msg(data.retMsg,{icon:1,time:3000})
+			}
+		},
+		error:function(data) {
+			$("input[type!='submit']").val("");
+			layer.msg(data.retMsg,{icon:1,time:3000})
+		}
+	});	
+}
+
+</script> 
+<!--/请在上方写此页面业务相关的脚本-->
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/lightbox2/2.8.1/js/lightbox.js}"></script>
+</body>
+</html>

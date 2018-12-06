@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="PscmAccount" />
+        <module name="PscmConf" />
+        <module name="PscmContract" />
+        <module name="PscmEngsafety" />
+        <module name="PscmLabour" />
+        <module name="PscmPersist" />
+        <module name="PscmSchedule" />
+        <module name="PscmService" />
+        <module name="PscmTender" />
+        <module name="PscmUtil" />
+        <module name="PscmWeb" />
+        <module name="PscmWorkflow" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Pscm" target="1.8" />
+      <module name="PscmAccount" target="1.8" />
+      <module name="PscmConf" target="1.8" />
+      <module name="PscmContract" target="1.8" />
+      <module name="PscmEngsafety" target="1.8" />
+      <module name="PscmLabour" target="1.8" />
+      <module name="PscmPersist" target="1.8" />
+      <module name="PscmSchedule" target="1.8" />
+      <module name="PscmService" target="1.8" />
+      <module name="PscmTender" target="1.8" />
+      <module name="PscmUtil" target="1.8" />
+      <module name="PscmWeb" target="1.8" />
+      <module name="PscmWorkflow" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

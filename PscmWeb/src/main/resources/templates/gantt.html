@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Load data from JSON file</title>
+</head>
+	<script type="text/javascript" th:src="@{/lib/jquery/1.9.1/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/comm.js}"></script> 
+	<script type="text/javascript" th:src="@{/lib/gantt-codebase/dhtmlxgantt.js}" charset="utf-8"></script>
+	<script type="text/javascript" th:src="@{/lib/gantt-codebase/locale/locale_cn.js}" charset="utf-8"></script>
+	<link rel="stylesheet" th:href="@{/lib/gantt-codebase/dhtmlxgantt.css}" type="text/css" media="screen" title="no title" charset="utf-8">
+
+	
+	<style type="text/css">
+		html, body{ padding:0px; margin:0px; height:100%; }
+	</style>
+<body>
+  <!-- div id="scroll" style="position:relative;width:100%;height:100%;overflow:scroll"> 
+	<div id="gantt_here" style='width:100%; height:140px;'>
+	</div>
+</div -->
+	<div id="gantt_here" style='width:100%; height:100%'></div>
+	
+	<script th:inline="javascript">
+	function getEngDivisionPlan(code, name){}
+	getEngDivisionPlan.ajax=function(code, name){
+	    jQuery.ajax({
+            type: "POST",
+            url: /*[[@{/engDivisionPlan/findEngDivisionPlanByPrimaryKey}]]*/,
+            data: "divisionsncode=" + code + "&divversion=V1",
+            async: false,
+            success: function(t) {
+            	var json = eval(t);
+            	if (json) {
+	            	alert("此划分已经添加");
+            	} else {
+            		var taskId = gantt.createTask({
+					    id: code,
+					    text: name,
+					    start_date: getNowDate(),
+					    duration:10,
+					    version:"V1"
+					}, "", 2);
+            	}
+            }
+         });
+	}
+		$(function(){
+	    	var divRight = $('#gantt_here')[0];
+		    divRight.ondragenter = function(e) {
+		        e.preventDefault();
+		    };
+		    //离开目标区域时执行
+		    divRight.ondragleave = function(e) {
+		        e.preventDefault();
+		    };
+		    //在目标区域上拖动时执行
+		    divRight.ondragover = function(dragEvent) {
+		    	var e = window.event|| dragEvent;
+		    	e.preventDefault();
+		    };
+		    //拖放时执行
+		    divRight.ondrop = function(e) {    	
+		    	//e.dataTransfer.dropEffect = 'move';
+		        var text = e.dataTransfer.getData("text").split("_");
+		        //var divlevel = e.dataTransfer.getData("divlevel");
+		        var isLeaf = text[2];//e.dataTransfer.getData("isLeaf");
+		        //工序才可以拖拽到甘特图
+		        if (isLeaf == 'Y') {
+		        	var name = text[1];//e.dataTransfer.getData("name");
+					var code = text[0];//e.dataTransfer.getData("code");
+					//父级划分
+					var parentCode = code.substring(0, code.lastIndexOf("."));
+					//判断当前甘特图的上一级划分是否和拖拽的划分的上一级划分相同
+					if ([[${itemcode}]] == parentCode) {
+						if (![[${readOnly}]]) {
+							getEngDivisionPlan.ajax(code, name);
+						} else {
+							alert("此划分无权操作");
+						}
+					} else {
+						alert("此划分的上一级划分与当前甘特图的上一级划分不一致，请先单击此划分，再拖拽");
+					}
+					
+			    }
+				/* var taskId = gantt.addTask({
+					id: code,
+				    text: name,
+				    start_date:"2017-07-01",
+				    duration:28
+				}, "", 2); */
+		        //addListItem("right", e.dataTransfer.getData("name"), e.dataTransfer.getData("no"));
+		        e.preventDefault();
+		    };
+		});
+		//gantt.locale.labels.section_version = "版本";
+		gantt.config.lightbox.sections = [
+			//{name: "description", height: 70, map_to: "text", type: "textarea", focus: true, readonly:true},
+			{name: "time", map_to: "auto", type: "duration"}
+			//{name: "version", height: 22, map_to: "version", type: "textarea"}
+		];
+		//gantt.config.readonly_property = "version";
+		gantt.config.task_height = 15;//修改gantt任务高度
+		gantt.config.row_height = 25;//修改gantt行高
+		
+		gantt.config.grid_width = 0;//
+		gantt.config.xml_date = "%Y-%m-%d";
+		//进度
+		gantt.config.drag_progress = false;
+		/* #if(${sec.allGranted("12")})
+			gantt.config.readonly = false;
+		#else
+			gantt.config.readonly = true;
+		#end */
+		if ([[${readOnly}]]) {
+			gantt.config.readonly = true;
+		} else {
+			gantt.config.readonly = false;
+		}
+		//清空划分序号编码
+		$("#staticDivSnCode",$("div[class='show_iframe'] iframe[src^='menu']", parent.document).contents()).val("");
+		//清空划分项编码
+		$("#staticDivItemCode",$("div[class='show_iframe'] iframe[src^='menu']", parent.document).contents()).val("");
+		gantt.attachEvent("onTaskClick", function(id,row){
+			if (![[${readOnly}]]) {
+				//划分序号编码
+				var divSnCode = id.split("|")[0];
+				//划分项编码
+				var divItemCode = "";
+				jQuery.ajax({
+		            type: "POST",
+		            url: /*[[@{/engDivision/findEngDivisionByPrimaryKey}]]*/,
+		            data: "divisionsncode=" + divSnCode,
+		            async: false,
+		            success: function(t) {
+		            	var json = eval(t);
+		            	if (json) {
+		            		divItemCode = json.divItemCode;
+		            	}
+		            }
+		         });
+	            //any custom logic here div[style='display: block;']
+	            //alert($("div[style!='display: none;'][class='show_iframe'] iframe[src^='menu']", parent.document).length)
+	            //if ($("iframe",$("div[style!='display: none;'][class='show_iframe'] iframe[src^='menu']", parent.document).contents()).length > 0) {
+	            var length = $("iframe",$("div[class='show_iframe'] iframe[src^='menu']", parent.document).contents()).length;
+	            for (var i = 0; i < length; i++) {
+		            if (jQuery.isFunction($("iframe",$("div[class='show_iframe'] iframe[src^='menu']", parent.document).contents())[i].contentWindow.setData)) {
+		            	//$("iframe",$("div[style!='display: none;'][class='show_iframe'] iframe[src^='menu']", parent.document).contents())
+		            	//$("iframe",$("div[style!='display: none;'][class='show_iframe'] iframe[src^='menu']", parent.document).contents())[0].contentWindow.setData(divSnCode);
+		            	
+	            		$("iframe",$("div[class='show_iframe'] iframe[src^='menu']", parent.document).contents())[i].contentWindow.setData(divSnCode, divItemCode);
+		            	//$("div[style!='display: none;'] iframe[id^='mainframe_']",$("div[style!='display: none;'][class='show_iframe'] iframe[src^='menu']", parent.document)[0].window)[0].contentWindow.setData(1);
+		            }
+	            }
+	            $("#staticDivSnCode",$("div[class='show_iframe'] iframe[src^='menu']", parent.document).contents()).val(divSnCode);
+	            $("#staticDivItemCode",$("div[class='show_iframe'] iframe[src^='menu']", parent.document).contents()).val(divItemCode);
+				return true;
+			} else {
+				alert("此划分无权操作");
+			}
+        });
+		/* X轴时间格式 */
+		var a=$(window.parent.document).find("#selectFir").val();
+		var b=$(window.parent.document).find("#finishnumber").val();
+
+		if(a=="years"){
+			gantt.config.scale_unit = "year";
+			gantt.config.step = 1;
+			gantt.config.date_scale = "%Y";
+			gantt.config.min_column_width = 1700/b;
+			gantt.init("gantt_here");
+		}else if(a=="months"){
+			gantt.config.scale_unit = "month";
+			gantt.config.step = 1;
+			gantt.config.date_scale = "%M %Y";
+			gantt.config.min_column_width = 1700/b;
+			gantt.init("gantt_here");
+		}else if(a=="days"){
+			gantt.config.scale_unit = "day";
+			gantt.config.step = 1;
+			gantt.config.date_scale = "%d %M";
+			gantt.config.min_column_width = 1700/b;
+			gantt.init("gantt_here");
+		}
+		
+		gantt.load(/*[[@{/gantt/ganttData?0_!nativeeditor_status=queried&ids=0&0_version=V1&0_itemcode=}+${itemcode}+'&0_workcode='+${workcode}]]*/, "json");
+        var dp = new gantt.dataProcessor(/*[[@{/gantt/ganttData}]]*/);
+        dp.init(gantt);
+		//gantt.load("$ctx/static/data/data.json", "json");
+		
+
+	</script>
+</body>
+</html>

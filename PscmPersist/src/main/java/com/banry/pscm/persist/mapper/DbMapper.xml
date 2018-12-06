@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="db">
+
+	<select id="listDB" resultType="java.util.HashMap">
+		<![CDATA[ show  databases; ]]>
+	</select>
+
+	<update id="createDb" parameterType="HashMap">
+		<![CDATA[ CREATE SCHEMA ${dbname} ]]>
+	</update>
+
+
+
+	<select id="getAllDBUserPassword" resultType="HashMap"
+		parameterType="HashMap">
+		<![CDATA[ select * from db ]]>
+	</select>
+
+
+	<select id="getDBUserPasswordByDbName" resultType="HashMap"
+		parameterType="HashMap">
+		<![CDATA[ select * from db where db_name ='${dbname}']]>
+	</select>
+
+
+	<update id="createNewUserForDB" parameterType="HashMap">
+		<![CDATA[ grant all privileges on ${dbname}.* to '${userName}'@'%'  identified by '${userPassword}';	]]>
+	</update>
+	
+	<insert id="saveDbPassword" parameterType="HashMap">
+		<![CDATA[ insert into db values ('${uuid}', '${dbname}', '${username}', '${userpassword}')]]>
+	</insert>
+
+	<select id="listTables" resultType="HashMap" parameterType="HashMap">
+		<![CDATA[ 
+				SELECT TABLE_NAME,TABLE_ROWS,DATA_LENGTH/1024/1024 DATA_LENGTH,CREATE_TIME,TABLE_COLLATION 
+				  FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${dbname}'
+				   ]]>
+	</select>
+
+	<select id="queryAllUser" resultType="HashMap" parameterType="HashMap">
+	  <![CDATA[  select user,host from mysql.user ]]>
+	</select>
+
+
+</mapper>

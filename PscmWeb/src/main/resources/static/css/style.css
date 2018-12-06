@@ -1,0 +1,18 @@
+@charset "utf-8";
+/* 你自己的样式 */
+
+#messageNumber{width:7px;height:7px;border-radius:50%;position:relative;left:97%;top:10px;background:#f30808;}
+.btn-status{color: #fff; background-color: #b5b7bb;border-color: #b5b7bb;}
+.btn-status:hover,
+.btn-status:focus,
+.btn-status:active,
+.btn-status.active{color:#fff;background-color:#94999a;border-color:#94999a}
+
+
+td a.details-control {
+    background: url('../images/details_open.png') no-repeat center right;
+    cursor: pointer;
+}
+tr.shown td a.details-control {
+    background: url('../images/details_close.png') no-repeat center right;
+}

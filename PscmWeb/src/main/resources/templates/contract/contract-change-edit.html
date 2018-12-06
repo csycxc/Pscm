@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>合同编辑</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+</head>
+<body>
+<article class="page-container">
+    <div th:fragment="edit">
+        <form class="form form-horizontal" id="changeContractInfo" name="changeContractInfo"
+              method="post" action="/contract/change/saveChangeContract">
+            <input type="hidden" id="contractCode" name="contractCode.downContractCode">
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>原合同名称：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="originalContractName"
+                           name="contractCode.contractName" class="input-text" readonly="readonly" required="required">
+                </div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>合同乙方:</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractPartSecond" name="contractCode.contractPartSecond.supplierName"
+                           class="input-text" readonly="readonly" required="required">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>变更时间：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="changeDate" name="changeDate"
+                           class="input-text Wdate" onfocus="WdatePicker({ dateFmt:'yyyy-MM-dd'})"
+                           readonly="readonly"></div>
+                <label class="form-label col-xs-3 col-sm-2">变更编号：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="changeCode" name="changeCode"
+                           class="input-text" readonly="readonly"></div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>原合同金额：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractAmount" name="contractCode.contractAmount"
+                           class="input-text" required="required" readonly="readonly">
+                </div>
+                <label class="form-label col-xs-3 col-sm-2">变更金额：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="supplementAmount" name="supplementAmount"
+                           class="input-text" required="required">
+                </div>
+            </div>
+            <div class="row cl" style="margin-left: 10px">
+                <label for="changeContent"><span class="c-red">*</span>变更内容:</label>
+                <div class="formControls" style="width: 95%">
+                    <textarea class="textarea" id="changeContent" name="changeContent" required="required"></textarea>
+                </div>
+            </div>
+            <div class="row cl" style="margin-left: 10px">
+                <label for="changeContent"><span class="c-red">*</span>变更证据:</label>
+                <div class="formControls" style="width: 95%">
+                    <textarea class="textarea" id="changeEvidence" name="changeEvidence" required="required"></textarea>
+                </div>
+            </div>
+            <div class="row cl" style="margin-left: 10px">
+                <label for="changeCause"><span class="c-red">*</span>变更原因及依据：</label>
+                <div class="formControls" style="width: 95%">
+                    <textarea class="textarea" id="changeCause" name="changeCause" required="required"></textarea>
+                </div>
+            </div>
+
+            <div style="text-align: center;margin-top: 10px;">
+                <button class="btn btn-success btn_save" type="submit">保存</button>
+                <button class="btn btn-default" type="reset">重置</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:fragment="view" style="margin-top: 10px;">
+
+        <div style="width: 100%; text-align: right">
+            <button class="btn btn-default btn-generate">生成审批文件</button>
+            <button class="btn btn-default btn-template">查看审批模板</button>
+        </div>
+
+
+        <br>
+
+        <div style="width: 100%">
+
+            <label for="contract-change-attachment">变更协议附件:</label>
+            <button class="btn btn-default btn-upload" style="float: right;">上传合同附件</button>
+        </div>
+
+        <table id="contract-change-attachment" cellspacing="0" border="1" class="ui celled table"
+               width="100%" align=center>
+            <thead>
+                <tr>
+                    <th>文件名</th>
+                    <th>类型</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+
+
+        <div style="width: 100%">
+            <label for="contract-change-checkRecord">审批记录:</label>
+        </div>
+        <table id="contract-change-checkRecord" border="1" class="ui celled table"
+               cellspacing="0" width="100%" align="center">
+            <thead>
+                <tr>
+                    <th>操作类型</th>
+                    <th>审批意见</th>
+                    <th>执行角色及人</th>
+                    <th>时间</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</article>
+</body>
+<script th:inline="javascript">
+    attachmentList = $("#contract-change-attachment").DataTable({
+        "searching":false,
+        "info": false,
+        "ordering": false,
+        "paging": false,
+        language:{ "sEmptyTable": "数据为空" }
+    });
+    checkRecordList = $("#contract-change-checkRecord").DataTable({
+        "searching":false,
+        "info": false,
+        "ordering": false,
+        "paging": false,
+        language:{ "sEmptyTable": "数据为空" }
+    });
+</script>
+</html>

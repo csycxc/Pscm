@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/semantic.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dataTables.semanticui.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/buttons.dataTables.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/select.dataTables.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/themes/default/easyui.css}"/>
+
+    <script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery/dataTables.select.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery/dataTables.buttons.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+    <script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+    <style>
+        .page-container{
+            padding: 1px 5px 5px 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="page-container">
+    <div class="cl pd-3 bg-1 bk-gray">
+
+        <a class="btn btn-success radius" style="float: left;line-height:1.6em;margin-top:3px"
+           href="javascript:location.replace(location.href);" title="刷新" >
+            <i class="btn-refresh Hui-iconfont">&#xe68f;</i></a>
+    </div>
+
+    <table id="template_list" class="ui celled table" cellspacing="0"
+           width="100%" align=center>
+        <thead>
+        <tr>
+            <th>合同类型</th>
+            <th>合同名称</th>
+            <th>来源</th>
+            <th>版本号</th>
+            <th>上传人</th>
+            <th>上传时间</th>
+            <th>附件</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+</body>
+<script th:inline="javascript">
+    var basePath = "/";
+    $(document).ready(function () {
+        $("#template_list").DataTable({
+            ajax : basePath + "contract/templates",
+            columns : [
+                {
+                    data:"bizType",
+                    "sDefaultContent" : "",
+                    render: function (data, type, full, meta) {
+                        var options = meta.settings.json.options;
+                        return options[data];
+                    }
+                },
+                {data:"contractTmplName","sDefaultContent" : ""},
+                {data:"source","sDefaultContent" : ""},
+                {data:"version","sDefaultContent" : ""},
+                {data:"uploadByOwnerid","sDefaultContent" : ""},
+                {data:"uploadDate","sDefaultContent" : ""},
+                {data:"attachement","sDefaultContent" : ""}
+            ],
+            language : {"sEmptyTable" :
+                    "数据为空"}
+        });
+    });
+</script>
+</html>

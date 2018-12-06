@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">  
+	
+<!--  <bean id="customUserEntityManager" class="com.banry.pscm.workflow.CustomUserEntityManager">
+ </bean>
+ <bean id="customGroupEntityManager" class="com.banry.pscm.workflow.CustomGroupEntityManager">
+ </bean> -->	
+
+ <!-- Activiti引擎配置 -->
+ <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+     <property name="dataSource" ref="dataSource" />
+     <property name="transactionManager" ref="txManager" />
+     <property name="databaseSchemaUpdate" value="true" />
+     <property name="jobExecutorActivate" value="false" />
+     <property name="deploymentResources" value="classpath*:/deployments/*.*"></property>
+     <!--不创建identity表 -->  
+	 <property name="dbIdentityUsed" value="false"/> 
+     <!-- <property name="customSessionFactories">
+         <list>
+	         <bean class="com.banry.pscm.workflow.util.CustomUserEntityManagerFactory">
+	         	<property name="customUserEntityManager" ref="customUserEntityManager"/>
+	         </bean>
+	         <bean class="com.banry.pscm.workflow.util.CustomGroupEntityManagerFactory">
+	         	<property name="customGroupEntityManager" ref="customGroupEntityManager"/>
+	         </bean>
+         </list>
+     </property> -->
+     <property name="activityFontName" value="宋体"/>
+	 <property name="labelFontName" value="宋体"/>
+	 <!-- <property name="eventListeners">
+      <list>
+         <bean class="org.com.banry.pscm.workflow.MyEventListener" />
+      </list>
+    </property> -->
+    <!-- <property name = "typedEventListeners">
+	    <map>
+	        <entry key="TASK_CREATED">
+	            <list>
+	                <bean class="com.banry.pscm.workflow.TaskCreateListener"/>
+	            </list>
+	        </entry>
+	        <entry key="TASK_COMPLETED">
+	            <list>
+	                <bean class="com.banry.pscm.workflow.TaskCompletedListener"/>
+	            </list>
+	        </entry>
+	        <entry key="PROCESS_COMPLETED">
+	            <list>
+	                <bean class="com.banry.pscm.workflow.ProcessCompletedListener"/>
+	            </list>
+	        </entry>
+	    </map>
+	</property> -->
+ </bean>
+
+ <!-- Activiti引擎工厂 -->
+<!--  <bean id="processEngineFactory" class="org.activiti.spring.ProcessEngineFactoryBean">
+     <property name="processEngineConfiguration" ref="processEngineConfiguration" />
+ </bean> -->
+
+ <!-- Activiti的Service -->
+<!--  <bean id="repositoryService" factory-bean="processEngineFactory" factory-method="getRepositoryService" />
+ <bean id="runtimeService" factory-bean="processEngineFactory" factory-method="getRuntimeService" />
+ <bean id="formService" factory-bean="processEngineFactory" factory-method="getFormService" />
+ <bean id="identityService" factory-bean="processEngineFactory" factory-method="getIdentityService" />
+ <bean id="taskService" factory-bean="processEngineFactory" factory-method="getTaskService" />
+ <bean id="historyService" factory-bean="processEngineFactory" factory-method="getHistoryService" />
+ <bean id="managementService" factory-bean="processEngineFactory" factory-method="getManagementService" /> -->
+ 
+</beans>  

@@ -1,0 +1,332 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link th:href="@{/css/jquery.dataTables.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/semantic.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/dataTables.semanticui.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/select.dataTables.min.css}" rel="stylesheet" type="text/css" />
+
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<link rel="stylesheet" th:href="@{/css/jquery.treegrid.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/themes/default/easyui.css}">
+
+<link rel="stylesheet" type="text/css" th:href="@{/css/tuodongyemian.css}"><!-- #box #leftdiv #rightdiv #line -->
+<script type="text/javascript" th:src="@{/js/addLoadEvent.js}"></script><!-- 页面默认加载多个事件 addLoadEvent(方法名1);addLoadEvent(方法名2); -->
+
+<script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/dataTables.select.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script> 
+	
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.treegrid.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.treegrid.bootstrap3.js}"></script>
+<style>
+.page-container{
+ padding: 1px 5px 5px 5px;
+}
+tr.focus{
+    background-color:#eee;
+}
+</style>
+</head>
+<body >
+<div id="box" class="page-container">
+	<div id="leftdiv">
+<!-- table -->
+		<div style="height:30px;">
+			<h4 style="float: left;color:blue;font-weight:bold;padding:5 0 0 5;">隐患类别>排查项目>排查内容 :</h4>
+		</div>
+		<div style="height:95%;border:solid 1px #ccc; overflow:scroll;">
+			<table id="hiddenTroubleBill" class="display tree" width="100%" align=center>
+				<thead style="display: none;background-color:CadetBlue;">
+					<tr><th width="100%">顶部</th></tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+	<div id="line"></div>
+	<div id="rightdiv">
+<!-- form -->
+		<div style="height:30px;">
+			<h4 style="float: left;color:blue;font-weight:bold;padding:5 0 0 5;">隐患详细信息 :</h4>
+		</div>
+		<div style="height:95%;border:solid 1px #ccc; overflow:scroll;">
+			<form class="form form-horizontal" id="form-ht-add" th:action="@{/hiddenTrouble/editToReport2}" onsubmit="return submitCheck()">
+			<div class="row cl">
+				<label class="form-label col-xs-3 col-sm-2">隐患类别：</label>
+				<div class="formControls col-xs-3 col-sm-3">
+					<span class="select-box"> <select id="troubleCate" class="select" name="troubleCate.enumValue" size="1"> 
+						<option th:value="${tc.enumValue}" th:each="tc:${tcLst}" th:text="${tc.enumValueName}">1</option>
+					</select>
+					</span>
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-3 col-sm-2">隐患级别：</label>
+				<div class="formControls col-xs-3 col-sm-3">
+					<span class="select-box"> <select id="troubleLevel" class="select" name="troubleLevel.enumValue" size="1"> 
+						<option th:value="${tl.enumValue}" th:each="tl:${tlLst}" th:text="${tl.enumValueName}">1</option>
+					</select>
+					</span>
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-3 col-sm-2">排查项目：</label>
+				<div class="formControls col-xs-3 col-sm-8">
+					<label1 class="investItem"></label1>
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-3 col-sm-2">划分名称：</label>
+				<div class="formControls col-xs-3 col-sm-8">
+					<label1 class="divname"></label1>
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-3 col-sm-2">排查内容：</label>
+				<div class="formControls col-xs-3 col-sm-8">
+					<label1 class="investContent"></label1>
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-3 col-sm-2">隐患说明：</label>
+				<div class="formControls col-xs-3 col-sm-8">
+					<label1 class="description"></label1>
+				</div>
+			</div>
+			<div style="display: none;" class="row cl"> <!-- 隐藏属性    用于传递数据 -->
+				<input type="text" class="input-text" value="" readonly="readonly" placeholder="" id="investContent" name="investContent"> 
+				<input type="text" class="input-text" value="" readonly="readonly" placeholder="" id="divname" name="divname">
+				<input type="text" class="input-text" value="" readonly="readonly" placeholder="" id="description" name="description"> 
+				<input type="text" class="input-text" value="" readonly="readonly" placeholder="" id="investItem" name="investItem">
+			</div>
+			<div style="display: none;" class="row cl"> <!-- 隐藏的其他属性   style="display: none;"-->
+				<input type="hidden" class="input-text" value="" readonly="readonly" placeholder="" id="divsncode" name="divsncode"> 
+				<label class="form-label col-xs-3 col-sm-2">隐患编码：</label>
+				<div class="formControls col-xs-3 col-sm-2">
+					<input type="text" class="input-text" value="" readonly="readonly" placeholder="" id="troubleCode" name="troubleCode">
+				</div>
+				<label class="form-label col-xs-3 col-sm-2">划分项：</label>
+				<div class="formControls col-xs-3 col-sm-6">
+					<input type="text" class="input-text" value="" readonly="readonly" placeholder="" id="divItemCode" name="divItemCode">
+				</div>
+				<label class="form-label col-xs-3 col-sm-2">隐患来源：</label>
+				<div class="formControls col-xs-3 col-sm-2">
+					<select id="troubleFrom" class="select" name="troubleFrom" size="1">
+						<option value="质量隐患" selected="selected">质量隐患</option>
+						<option value="安全隐患">安全隐患</option>
+					</select>
+				</div>
+			</div>
+			<div class="row cl"><!-- 保存和生成隐患 按钮 -->
+				<div class="col-xs-3 col-sm-2 col-xs-offset-3 col-sm-offset-2">
+					<button class="btn btn-primary radius" type="button" id="btn_save">&nbsp;&nbsp;保存&nbsp;&nbsp;</button>
+				</div>
+				<div class="col-xs-3 col-sm-2 col-xs-offset-3 col-sm-offset-2">
+					<button class="btn btn-primary radius" type="submit" id="btn_submit" >&nbsp;生成隐患&nbsp;</button>
+				</div>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+	
+<script th:inline="javaScript">
+    var hiddenTroubleBill;
+
+    addLoadEvent(zuoyoutuodong);//页面默认加载方法1
+    addLoadEvent(jiazai);//页面默认加载方法2
+
+    function jiazai(){
+    	setData($("#staticDivSnCode", parent.document).val(), $("#staticDivItemCode", parent.document).val());
+    }
+	/* $(document).ready(function() {
+		setData($("#staticDivSnCode", parent.document).val(), $("#staticDivItemCode", parent.document).val());
+	}); */
+	function submitCheck() {
+		if ($('#troubleCode').val() == "") {
+			layer.msg('请先选择一条隐患',{icon:1,time:1000});
+			return false;
+		} else {
+			return true;
+		}
+	}
+	$("#troubleFrom").change(function(){
+    	var selObj = $("#troubleCate");
+		$("#troubleCate").empty();
+		if ($("#troubleFrom").val() == "质量隐患") {
+   			var tc = /*[[${tcLst}]]*/
+			for( var p in tc) {
+				selObj.append('<option value="' + tc[p].enumValue + '">' + tc[p].enumValueName + '</option>');
+			}
+   		} else {
+   			var tc1 = /*[[${tcLst1}]]*/
+			for( var p in tc1) {
+				selObj.append('<option value="' + tc1[p].enumValue + '">' + tc1[p].enumValueName + '</option>');
+			}
+   		}
+	});
+	//保存
+	$('#btn_save').click(function(){
+		jQuery.ajax({
+			type: "POST",
+			url: /*[[@{/hiddenTroubleBill/saveSafeHiddenTroubleBill}]]*/,
+			data:$("#form-ht-add").serialize(),
+			success:function(msg){
+				if(msg==true){
+					layer.msg('保存成功!',{icon:1,time:1000},function(){
+						setData($("#staticDivSnCode", parent.document).val(), $("#staticDivItemCode", parent.document).val());
+					});
+				}else{
+					layer.msg('保存失败!',{icon:1,time:1000});
+				}
+			}
+		});
+	});
+	function getDivName(divisionsncode){
+		jQuery.ajax({
+			type:"post",
+			url:/*[[@{/engDivision/findEngDivisionByPrimaryKey}]]*/,
+			data:{divisionsncode:divisionsncode},
+			success:function(data){
+				$("#divname").val(data.divName);
+				$(".divname").text(data.divName);
+			}
+		});
+	}
+	function setData(divSnCode, d) {
+		$("#form-ht-add").form("clear");//清空form
+    	$("label1").text("");//清空label1,其中label1为要显示的数据自定义的标签
+		layer.closeAll();
+		if ($('#hiddenTroubleBill').hasClass('dataTable')){
+			//userTable.fnClearTable(false);//清空数据.fnClearTable();//清空数据  
+			hiddenTroubleBill.destroy(); //还原初始化了的datatable  
+		}
+		hiddenTroubleBill = $('#hiddenTroubleBill').DataTable({
+			ajax : /*[[@{/hiddenTroubleBill/findTroubleCateInvestItem}]]*/,
+			"searching":false,//去掉右上角的搜索框
+			"info": false,//去掉底部文字
+			fnServerParams : function (aoData) {
+				aoData.push(
+					{ name : "divItemCode", value : d}, { name : "troubleFrom", value : '安全隐患'}, { name : "fromCode", value : '隐患清单'}
+				);
+			},
+			columns : [
+				{ data : "investContent", "sDefaultContent" : "" }, 
+            ],
+            "ordering": false,
+            "paging": false,
+            language:{
+	        	"sEmptyTable": "数据为空"
+	        },
+			select: {
+	            style: 'single'
+	        },
+			"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+        		$(nRow).addClass(aData.classname);
+        		$(nRow).attr("id", aData.classid);
+	         },
+	         "initComplete": function ( settings ) {
+	        	 $('#hiddenTroubleBill').treegrid({
+	                 'initialState': 'collapsed'
+	             });
+		         $("tr[class*='treegrid-i']").on('expand', function(){
+		        	// alert($(this))
+		        	 var id = $(this).attr("id");
+		        	 //$('.treegrid-i41').treegrid('render');
+		        	 if ($(this).treegrid('getChildNodes').length == 0) {
+		        		 var h = 0;
+		        		 if ($(this).treegrid('getParentNodeId').length > 1) {
+		        			 h = $(this).treegrid('getParentNodeId').substring(1)
+		        		 }
+		        		 jQuery.ajax({
+		     				type: "POST",
+		     				url: /*[[@{/hiddenTroubleBill/findHiddTrouListByTroCateInvItem}]]*/,
+		     				data:{
+		     					divItemCode: d,
+		     					fromCode : '隐患清单',
+		     					troubleFrom : '安全隐患',
+		     					troubleCate : h,
+		     					investItem : $('td:eq(0)', $(this)).text(),
+		     					i:id
+		     				},
+		     				success:function(data){
+		     					var html = "";
+	     						for(var i=0;i<data.data.length;i++){
+	     							html += '<tr role="row" class="'+data.data[i].classname+'" style="display: table-row;"><span class="treegrid-expander"></span>'
+	     								 +'<td>'+ data.data[i].investContent +'</td>'
+	     								 +'<td  style="display:none">'+data.data[i].troubleCode+'</td>'
+	     								 +'<td  style="display:none">'+data.data[i].troubleLevel.enumValue+'</td>'
+	     								 +'<td  style="display:none">'+data.data[i].troubleFrom+'</td>'
+	     								 +'<td  style="display:none">'+data.data[i].investItem+'</td>'
+	     								 +'<td  style="display:none">'+data.data[i].divItemCode+'</td>'
+	     								 +'<td  style="display:none">'+data.data[i].troubleCate.enumValue+'</td>'
+	     								 +'<td  style="display:none">'+data.data[i].description+'</td></tr>';
+	     						}
+	     						$("tr[id='" +id+ "']").after(html);
+	     						$("tr[class*='treegrid-parent-" + id + "']").each(function(){
+	     						    $(this).treegrid('setTreeContainer', $('#hiddenTroubleBill'));
+		     						$(this).treegrid('initExpander').treegrid('initIndent').treegrid('initEvents').treegrid('initState').treegrid('initChangeEvent').treegrid("initSettingsEvents");
+	     						});
+	     						$("tr[class*='treegrid-parent-" + id + "']").click(function() {//为表格的行添加点击事件
+	     							$(this).css("background","#8EE5EE").siblings().css("background","");//改变当前选中行背景色
+	     							var tr = $(this);
+	     							var tdArr = tr.find("td");
+	     							//alert("排查内容："+tdArr.eq(0).text()+"                隐患编码："+tdArr.eq(1).text()+"      隐患名字："+tdArr.eq(2).text()+"             隐患级别："+tdArr.eq(3).text()+"  影响因素类别："+tdArr.eq(4).text()+"   影响范围："+tdArr.eq(5).text()+"   lec："+tdArr.eq(6).text()+"      隐患lai源："+tdArr.eq(7).text()+"   排查项目："+tdArr.eq(8).text()+"  划分项编码："+tdArr.eq(9).text()+"  隐患类别："+tdArr.eq(10).text()+"  隐患说明："+tdArr.eq(11).text());
+	     							/*测试结果：排查内容：架体分段搭设、分段使用未进行分段验收，扣5分        隐患编码：B.5.1.6.2                                                隐患名字：架体分段搭设、分段使用未进行分段验收，扣5分      隐患级别：1                                                         影响因素类别：影响因素类别                                        影响范围：隐患的影响范围                                    lec：lec                         隐患lai源：安全隐患                                               排查项目：交底与验收                                          划分项编码：K.3                                                    隐患类别：55                                                          隐患说明：描述*/
+	     							//alert(JSON.stringify(tds[0]));
+     								$(".divname").text("");//置空
+	     							$(".investContent").text("");//置空
+	     							$(".divItemCode").text("");//置空
+	     							$(".description").text("");//置空
+	     							$(".investItem").text("");//置空
+	     							var divisionsncode=$("#staticDivSnCode", parent.document).val();
+	     							if(divisionsncode!=null){  getDivName(divisionsncode);  }
+	     							var selObj = $("#troubleCate");
+	     							$("#troubleCate").empty();
+	     							if (tdArr.eq(3).text() == "质量隐患") {
+	     				    			var tc = /*[[${tcLst}]]*/
+     				    				for( var p in tc) {
+     				    					selObj.append('<option value="' + tc[p].enumValue + '">' + tc[p].enumValueName + '</option>');
+     				    				}
+	     				    		} else {
+	     				    			var tc1 = /*[[${tcLst1}]]*/	
+	     				    			for( var p in tc1) {
+		     				   				selObj.append('<option value="' + tc1[p].enumValue + '">' + tc1[p].enumValueName + '</option>');
+		     				   			}
+	     				    		}
+     								$("#investContent").val(tdArr.eq(0).text());//排查内容 
+	     				            $(".investContent").text(tdArr.eq(0).text());//排查内容 
+	     				           	$("#troubleCode").val(tdArr.eq(1).text());//隐患编码
+	     				            $("#troubleLevel").val(tdArr.eq(2).text());//隐患级别
+	     				            $("#troubleFrom").val(tdArr.eq(3).text());//隐患来源
+	     				           	$("#investItem").val(tdArr.eq(4).text());//排查项目
+	     				            $(".investItem").text(tdArr.eq(4).text());//排查项目
+	     				            $("#divItemCode").val(tdArr.eq(5).text());//划分项编码
+	     				            $(".divItemCode").text(tdArr.eq(5).text());//划分项编码
+	     				            $("#troubleCate").val(tdArr.eq(6).text());//隐患类别
+	     				            $("#description").val(tdArr.eq(7).text());//隐患说明
+	     				            $(".description").text(tdArr.eq(7).text());//隐患说明 
+	     				            $("#divsncode").val(divSnCode);//划分编码
+     							});
+		     				}
+		     			});
+		        	 }
+	        	})
+	         }
+		});
+	}
+</script>
+</body>
+</html>

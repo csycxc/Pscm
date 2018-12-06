@@ -1,0 +1,183 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link th:href="@{/css/jquery.dataTables.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/semantic.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/dataTables.semanticui.min.css}" rel="stylesheet" type="text/css" />
+
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+
+<script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+	
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>	
+<style>
+.page-container{
+ padding: 1px 5px 5px 5px;
+}
+</style>
+</head>
+<body >
+	<!-- 隐患处理页面  -->
+	<div class="page-container">
+		<div class="cl pd-3 bg-1 bk-gray">
+			<a class="btn btn-success radius" style="float: left; line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="btn-refresh Hui-iconfont">&#xe68f;</i></a>
+		</div>
+
+		<table id="hiddenTrouble" class="display" cellspacing="0" width="100%" align=center style="table-layout:fixed">
+			<thead>
+				<tr>
+					<th style="width:10%;text-align:center;">排查项目</th>
+					<th style="width:20%;text-align:center;">排查内容</th>
+					<th style="width:10%;text-align:center;">隐患级别</th>
+					<th style="width:25%;text-align:center;">隐患描述</th>
+					<th style="width:15%;text-align:center;">发生地点</th>
+					<th style="width:7%; text-align:center;">开始时间</th>
+					<th style="width:7%; text-align:center;">处理状态</th>
+					<th style="width:6%; text-align:center;">操作</th>
+				</tr>
+			</thead>
+		</table>
+
+	</div>
+	<script th:inline="javaScript">
+	/*<![CDATA[*/  
+		var basePath = /*[[@{/}]]*/;  
+	/*]]>*/
+	function AddDays(date,value)  { 
+		date.setDate(date.getDate()+value); 
+	}
+	var hiddenTrouble;
+	$(document).ready(function() {
+		setData($("#staticDivSnCode", parent.document).val());
+	});
+	
+	function setData(d) {
+		if ($('#hiddenTrouble').hasClass('dataTable')){
+			hiddenTrouble.destroy(); //还原初始化了的datatable  
+		}
+		hiddenTrouble = $('#hiddenTrouble').DataTable({
+			ajax : /*[[@{hiddenTrouble/getMyTaskList}]]*/,
+			fnServerParams : function (aoData) {
+				aoData.push(
+					{ name : "divSnCode", value : d}
+				);
+			},
+			columns : [{
+				data : "troubleBillItemCode.investItem",
+				"sDefaultContent" : ""
+			}, {
+				data : "troubleBillItemCode.investContent",
+				"sDefaultContent" : ""
+			}, {
+				data : "troubleBillItemCode.troubleLevel.enumValueName",
+				"sDefaultContent" : ""
+			},{
+				data : "description",
+				"sDefaultContent" : ""
+			},{
+				data : "takePlace",
+				"sDefaultContent" : ""
+			}, {
+				data : "startDate",
+				"sDefaultContent" : ""
+			}, {
+				data : "status.enumValueName",
+				"sDefaultContent" : ""
+			}, {
+                 "sClass": "center",
+                 "data": null,
+                 "orderable": false,  
+                 "render": function (data, type, full, meta) {
+                	 if (data.status.enumValue == 1) {
+                		 return '<a style="text-decoration:none" class="ml-5" onClick="hiddenTrouble_add(\'隐患处理编辑\',\'' + basePath + 'hiddenTrouble/edit?troubleCode' 
+                				 + data.troubleCode + '\',\'800\',\'500\')" href="javascript:;" title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a> <a style="text-decoration:none" class="ml-5" onClick="hiddenTrouble_del(this,\'' + data.troubleCode + '\')" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>';
+                	 } else {
+                		 //if (data.taskAssignee) {
+                			return '<a style="text-decoration:none" class="ml-5" onClick="hiddenTrouble_add(\'' + data.taskName+ '\',\''+ basePath + 'hiddenTrouble/task/view/' + data.taskId + '\',\'800\',\'500\')" href="javascript:;" title="审批"><i class="Hui-iconfont">&#xe6e1;</i></a>'
+                			+ '<a style="text-decoration:none" class="ml-5" onClick="hiddenTrouble_add(\'流程图查看\',\'' + basePath + 'activiti/read-resource?processDefinitionId=hiddenTrouble&resourceName=hiddenTrouble.png&businessKey=' 
+                					+ data.troubleCode + '\',\'800\',\'500\')" href="javascript:;" title="查看流程"><i class="Hui-iconfont">&#xe695;</i></a>';
+                		 /* } else {
+                			return '<a style="text-decoration:none" class="ml-5" onClick="hiddenTrouble_claim(this,\'' + data.taskId + '\')" href="javascript:;" title="签收"><i class="Hui-iconfont">&#xe692;</i></a>'
+                			+ '<a style="text-decoration:none" class="ml-5" onClick="hiddenTrouble_add(\'流程图查看\',\'$ctx/activiti/read-resource?processDefinitionId=hiddenTrouble&resourceName=hiddenTrouble.png&businessKey=' + data.troubleCode + '\',\'800\',\'500\')" href="javascript:;" title="查看流程"><i class="Hui-iconfont">&#xe695;</i></a>';
+                		 } */
+                		 
+                	 }
+                     
+                 }
+            }],
+            "aoColumnDefs": [
+          	  {"orderable":false,"aTargets":[5]}// 不参与排序的列
+          	],
+			language:{ "sEmptyTable": "数据为空" },
+			createdRow: function( nRow, aData, iDisplayIndex ) {
+				 if (aData.rectifytime) {
+					 var date1 = new Date(aData.rectifytime.replace(/-/g,"/"));
+					 var date2 = new Date(aData.rectifytimelimit.replace(/-/g,"/"));
+					 AddDays(date2, aData.rectifypostpone)
+					 if (date1 > date2) {
+			        	nRow.style.backgroundColor="red";
+					 }
+				 }
+		    }
+		});
+	}
+			
+		
+		
+		/*隐患处理-添加*/
+		function hiddenTrouble_add(title,url,w,h){
+			var index = layer.open({
+				type: 2,
+				title: title,
+				content: url
+			});
+			layer.full(index);
+		}
+		/*隐患处理-删除*/
+		function hiddenTrouble_del(obj,id){
+			layer.confirm('确认要删除吗？',function(index){
+				jQuery.ajax({
+					type : 'POST',
+					url : /*[[@{/hiddenTrouble/deleteHiddenTrouble}]]*/,
+					data : {"roleCodes" : id},
+					//dataType: 'json',
+					success: function(data){
+						$(obj).parents("tr").remove();
+						layer.msg('删除成功!',{icon:1,time:1000});
+					},
+					error:function(data) {
+						layer.msg('删除失败!',{icon:1,time:1000});
+						console.log(data.msg);
+					},
+				});		
+			});
+		}
+		/*隐患处理-签收*/
+		function hiddenTrouble_claim(obj,id){
+				jQuery.ajax({
+					type : 'POST',
+					url : /*[[#{/hiddenTrouble/task/claim/}]]*/
+						+ id,
+					dataType: 'json',
+					success: function(data){
+						layer.msg(data.retMsg,{icon:1,time:1000});
+						$('.btn-refresh').click();
+					},
+					error:function(data) {
+						layer.msg('签收失败!',{icon:1,time:1000});
+						console.log(data.msg);
+					},
+				});		
+		}
+	</script>
+
+</body>
+</html>

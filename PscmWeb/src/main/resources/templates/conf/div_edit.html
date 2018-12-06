@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="cn">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!-- jqGrid组件基础样式包-必要 -->
+<link rel="stylesheet" href="jqgrid/css/ui.jqgrid.css" />
+<!-- jqGrid主题包-非必要 --> 
+<!-- 在jqgrid/css/css这个目录下还有其他的主题包，可以尝试更换看效果 -->
+<link rel="stylesheet" href="jqgrid/css/css/redmond/jquery-ui-1.8.16.custom.css" />
+<!-- jquery插件包-必要 -->
+<!-- 这个是所有jquery插件的基础，首先第一个引入 -->
+<script type="text/javascript" src="js/jquery-1.7.1.js"></script>
+<!-- jqGrid插件包-必要 -->
+<script type="text/javascript" src="jqgrid/js/jquery.jqGrid.src.js"></script>
+<!-- jqGrid插件的多语言包-非必要 -->
+<!-- 在jqgrid/js/i18n下还有其他的多语言包，可以尝试更换看效果 -->
+<script type="text/javascript" src="jqgrid/js/i18n/grid.locale-cn.js"></script>
+
+
+<!-- 覆盖默认jqGrid样式，增大字体 -->
+<style>
+.ui-jqgrid {
+font-size: 14px;
+} 
+.ui-jqgrid-view {
+font-size: 14px;
+}
+.ui-jqgrid .ui-jqgrid-htable th {
+height: 28px;
+font-size: 14px;
+}
+.ui-jqgrid .ui-jqgrid-pager {
+height: 28px;
+font-size: 14px;
+}
+.ui-jqgrid .ui-pg-input {
+font-size: 1em;
+height: 20px;
+
+.ui-jqgrid .i-pg-selbox {
+font-size: 0.9em;
+height: 20px;
+}
+.ui-jqgrid tr.ui-row-ltr td {
+text-align: center;
+}
+</style>
+
+<script type="text/javascript">
+	  
+	 </script>
+	 
+</head>
+<body>
+
+<!-- 使用表格布局， 以后可以考虑控件，做带有分割线，可调整的灵活布局方式-->
+<table border=0 width=100%>
+	<tr valign="top">
+	<td colspan="2">
+		<!-- 分项工程清单信息 -->
+		<table id="sub_div_work_bill_table" align=center></table> 
+		<div   id="sub_div_work_bill_table_nav" align=center></div>
+	</td>
+	</tr>
+	
+	<tr valign="top">
+	<td colspan="2">
+	<!-- 分项工程定额数据表 -->
+	<!-- 
+	<input type="button" value="编辑" onclick="startEdit()" />
+	<input type="button" value="保存" onclick="saveRows()" /> 
+	批量保存
+	-->
+		<table id="sub_div_work_quota_table" align=center></table> 
+		<div id="sub_div_work_quota_table_nav" align=center></div>
+	</td>
+	</tr>
+	
+	
+	<tr valign="top">
+		<td width=50% align=left >
+			<!-- 隐患 -->
+			<table id="ht_edit_table" align=center></table> 
+			<div id="ht_edit_nav" align=center></div>
+			
+		</td>
+		<td width=50% align=right>
+			<!-- 危险源 -->
+			<table id="ha_edit_table" align=center></table> 
+			<div id="ha_edit_nav" align=center></div>
+			
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>
+
+<!-- 配置管理app java scripts -->
+<script type="text/javascript" src="js/div_edit.js"></script>

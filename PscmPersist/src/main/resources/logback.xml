@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+		</layout>
+	</appender>
+	
+	<appender name="BUSINESS_ERROR_FILE_OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  
+				<fileNamePattern>C:/log/error.%d{yyyy-MM-dd}.log</fileNamePattern>  
+				<maxHistory>30</maxHistory>  
+			</rollingPolicy>  
+			<encoder>  
+				<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>  
+			</encoder>  
+		</appender>  
+  
+	<appender name="BUSINESS_RECORD_FILE_OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  
+			<fileNamePattern>C:/log/record.%d{yyyy-MM-dd}.log</fileNamePattern>  
+			<maxHistory>30</maxHistory>  
+		</rollingPolicy>  
+		<encoder>  
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>  
+		</encoder>  
+	</appender>  
+  	
+	
+	<!--业务执行相关信息输出到记录文件-->
+	<logger name="PscmWeb" level="INFO" >  
+		<appender-ref ref="BUSINESS_RECORD_FILE_OUT" />  
+	</logger> 
+  
+  	<!--业务中异常输出到异常文件-->
+	<logger name="PscmWeb" level="ERROR" additivity="false">  
+		<appender-ref ref="BUSINESS_ERROR_FILE_OUT" />  
+	</logger> 
+
+	<logger name="org.springframework" level="WARN" additivity="false">
+		<appender-ref ref="BUSINESS_RECORD_FILE_OUT" />  
+		<appender-ref ref="STDOUT" />  
+	</logger>
+	
+	<!-- logger name="org.hibernate" level="WARN" /-->
+	<!--myibatis log configure-->
+	<logger name="com.banry.pscm.budget" level="debug" />
+	<logger name="org.apache.ibatis" level="TRACE"/>
+	<logger name="java.sql.Connection" level="DEBUG"/>
+	<logger name="java.sql.Statement" level="DEBUG"/>
+	<logger name="java.sql.PreparedStatement" level="DEBUG"/>
+	
+	<root level="debug">
+		<appender-ref ref="STDOUT" />
+	</root>
+</configuration>

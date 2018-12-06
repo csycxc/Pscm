@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+</head>
+<body>
+
+<div th:fragment="topbar">
+	<article class="page-container">
+		<form id="bidResultInfo" name="bidResultInfo" class="form form-horizontal" >
+			<div class="row cl">
+				<label class="form-label col-xs-3 col-sm-3 col-md-3">工作项名称:</label>
+				<div class="formControls col-xs-3 col-sm-3 col-md-9">
+					<input type="hidden" name="flag" id="flag" value="">
+					<input type="hidden" name="tenderResultIdChangeCode" id="tenderResultIdChangeCode" value="">
+					<input type="text" name="workItemName" id="workItemName" readonly="readonly" style="display: none" class="input-text">
+					<input type="hidden" name="bidResultCode.bidResultCode" id="bidResultCode" value="">
+					<select name="bidResultCodeSelect" id="bidResultCodeSelect" class="option_show">
+					</select>
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-3 col-md-3">变更日期:</label>
+				<div class="formControls col-xs-3 col-md-5">
+					<input type="text"  value="" onfocus="WdatePicker({ dateFmt:'yyyy-MM-dd'})" id="changeDate" name="changeDate" class="input-text Wdate">
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-3 col-sm-3 col-md-3">变更原因:</label>
+				<div class="formControls col-xs-9 col-sm-3 col-md-9">
+					<textarea class="input-text" id="changeReason" name="changeReason" style="height: 80px;"></textarea>
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-4 col-sm-4 col-md-4">招标结果:</label>
+				<table id="report" class="display" cellspacing="0" align="center" style="table-layout:fixed">
+					<thead>
+						<tr>
+							<th style="width:50%;">单位名称</th>
+							<th style="width:25%;">一次报价</th>
+							<th style="width:25%;">最终报价</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-3">审批记录:</label>
+				<table id="approval"  class="ui celled table" cellspacing="0"
+					width="100%" align=center  style="table-layout:fixed">
+					<thead>
+						<tr>
+							<th style="width:22%;text-align:center;">处理名称</th>
+							<th style="width:50%;text-align:center;">处理要求</th>
+							<th style="width:18%;text-align:center;">处理时间</th>
+							<th style="width:10%;text-align:center;">处理人</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<div class="row cl" id="btn_save" style="display: none;">
+				<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3" style="margin-left: 20px;">
+					<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;保存&nbsp;&nbsp;">
+				</div>
+			</div>
+		</form>
+	</article>
+</div>
+</body>
+</html>

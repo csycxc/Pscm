@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>合同编辑</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+</head>
+<body>
+<article class="page-container">
+    <div th:fragment="edit">
+        <form class="form form-horizontal" id="downContractInfo" name="downContractInfo"
+              method="post" action="/contract/down/saveDownContract">
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>招标结果：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="hidden" value="" id="tenderResultCode" name="tenderResultCode">
+                    <input type="text" value="" placeholder="" id="workItemName"
+                           class="input-text" readonly="readonly" required="required">
+                </div>
+                <label class="form-label col-xs-3 col-sm-2 downContractCode"><span class="c-red">*</span>合同编号：</label>
+                <div class="formControls col-xs-3 col-sm-4 downContractCode">
+                    <input type="text" value="" placeholder="" id="downContractCode" name="downContractCode"
+                           class="input-text" readonly="readonly"></div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>合同名称:</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractName" name="contractName" class="input-text"
+                        required="required">
+                </div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>交易活动类型:</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="hidden" id="bizType" name="bizType">
+                    <input type="text" id="bizTypeName"  class="input-text" required="required" readonly="readonly">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>合同甲方：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractPartFirst" name="contractPartFirst"
+                           class="input-text" required="required" readonly="readonly"></div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>合同乙方：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="hidden" id="contractPartSecond-supplierCreditCode" name="contractPartSecond.supplierCreditCode">
+                    <input type="text" value="" placeholder="" id="contractPartSecond-supplierName" name="contractPartSecond.supplierName"
+                           class="input-text" required="required" readonly="readonly"></div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2">合同丙方：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractPartThird" name="contractPartThird"
+                           class="input-text"></div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>履行地点：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="fulfilSpot" name="fulfilSpot"
+                           class="input-text" required="required">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>预定签订时间：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="expectedSignDate" name="expectedSignDate"
+                            class="input-text Wdate" onfocus="WdatePicker({ dateFmt:'yyyy-MM-dd'})" required="required">
+                </div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>实际签订时间：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="actualSignDate" name="actualSignDate"
+                           class="input-text Wdate" onfocus="WdatePicker({ dateFmt:'yyyy-MM-dd'})" required="required">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>合同金额：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractAmount" name="contractAmount"
+                           class="input-text" required="required">
+                </div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>付款比例：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractPayRate" name="contractPayRate"
+                           class="input-text" required="required">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>合同支付：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractPayment" name="contractPayment"
+                           class="input-text" required="required"></div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>公司资产：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="corporateAssets" name="corporateAssets"
+                           class="input-text" required="required"></div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>风险等级：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="riskLevel" name="riskLevel"
+                           class="input-text" required="required">
+                </div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>合同标的：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractTargetMatter" name="contractTargetMatter"
+                           class="input-text" required="required"></div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2">样本合同：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="comtractTmpl" name="comtractTmpl" class="input-text">
+                </div>
+            </div>
+
+            <div style="text-align: center">
+                <button class="btn btn-success btn_save" type="submit">保存</button>
+                <button class="btn btn-default" type="reset">重置</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:fragment="view" style="margin-top: 10px;">
+
+        <div style="width: 100%; text-align: right">
+            <button class="btn btn-default btn-generate">生成审批文件</button>
+            <button class="btn btn-default btn-template">查看审批模板</button>
+        </div>
+
+
+        <br>
+
+        <div style="width: 100%">
+            <label for="contract-attachment">合同附件:</label>
+            <button class="btn btn-default btn-upload" style="float: right;">上传合同附件</button>
+        </div>
+
+        <table id="contract-attachment" cellspacing="0" border="1" class="ui celled table"
+               width="100%" align=center>
+            <thead>
+                <tr>
+                    <th>文件名</th>
+                    <th>类型</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div style="width: 100%">
+            <label for="contract-checkRecord">审批记录:</label>
+        </div>
+        <table id="contract-checkRecord" border="1" class="ui celled table"
+               cellspacing="0" width="100%" align="center">
+            <thead>
+                <tr>
+                    <th>操作类型</th>
+                    <th>审批意见</th>
+                    <th>执行角色及人</th>
+                    <th>时间</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</article>
+</body>
+<script th:inline="javascript">
+    attachmentList = $("#contract-attachment").DataTable({
+        "searching":false,
+        "info": false,
+        "ordering": false,
+        "paging": false,
+        language:{ "sEmptyTable": "数据为空" }
+    });
+    checkRecordList = $("#contract-checkRecord").DataTable({
+        "searching":false,
+        "info": false,
+        "ordering": false,
+        "paging": false,
+        language:{ "sEmptyTable": "数据为空" }
+    });
+</script>
+</html>

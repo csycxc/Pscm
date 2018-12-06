@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/semantic.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/dataTables.semanticui.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+
+<script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>	
+<style>
+.page-container{
+ padding: 1px 5px 5px 5px;
+}
+</style>
+</head>
+<body >
+	<!-- 隐患处理查询页面 -->
+	<div class="page-container">
+		<div class="cl pd-3 bg-1 bk-gray">
+			<span class="l"><a th:href="@{/models/newModel}"
+			class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i>
+				添加模型</a></span>
+			<a class="btn btn-success radius" style="float: left;line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="btn-refresh Hui-iconfont">&#xe68f;</i></a>
+		</div>
+		<div class="page-container">
+			<div class="text-c">
+				<form class="Huiform" method="post" action="" target="_self">
+					<span class="btn-upload form-group">
+					<input class="input-text upload-url" type="text" name="uploadfile-2" id="uploadfile-2" readonly style="width:200px">
+					<a href="javascript:void();" class="btn btn-primary upload-btn"><i class="Hui-iconfont">&#xe642;</i> 上传模型</a>
+					<input type="file" multiple name="uploadfile" id="uploadfile" class="input-file">
+					</span><button type="button" class="btn btn-success" id="uploadBut"><i class="Hui-iconfont">&#xe600;</i> 上传</button>
+				</form>
+			</div>
+		</div>
+		<div class="btn-primary radius" style="text-align: center;">模型列表</div>
+		<table id="modelList" class="display" cellspacing="0" width="100%" align=center style="table-layout:fixed">
+			<thead>
+				<tr>
+					<th style="width:10%;text-align:center;">模型编号</th>
+					<th style="width:30%;text-align:center;">模型名称</th>
+					<th style="width:10%;text-align:center;">版本</th>
+					<th style="width:25%;text-align:center;">创建时间</th>
+					<th style="width:25%; text-align:center;">操作</th>
+				</tr>
+			</thead>
+		</table>
+		<div class="btn-primary radius" style="text-align: center;">部署列表</div>
+		<table id="deploymentList" class="display" cellspacing="0" width="100%" align=center style="table-layout:fixed">
+			<thead>
+				<tr>
+					<th style="width:10%;text-align:center;">编号</th>
+					<th style="width:40%;text-align:center;">名称</th>
+					<th style="width:25%;text-align:center;">部署时间</th>
+					<th style="width:25%; text-align:center;">操作</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<script th:inline="JavaScript">
+	var basePath = /*[[@{/}]]*/;
+	
+	$(document).ready(function() {
+		$("#uploadBut").click(function () {
+            var formData = new FormData();
+            formData.append("uploadfile", document.getElementById("uploadfile").files[0]);   
+            $.ajax({
+                url: basePath + "models/uploadFile",
+                type: "POST",
+                data: formData,
+                /**
+                *必须false才会自动加上正确的Content-Type
+                */
+                contentType: false,
+                /**
+                * 必须false才会避开jQuery对 formdata 的默认处理
+                * XMLHttpRequest会对 formdata 进行正确的处理
+                */
+                processData: false,
+                success: function (data) {
+                    if (data.result) {
+                        layer.msg('上传成功!',{icon:1,time:1000});
+    					$('.btn-refresh').click();
+                    } else {
+                    	layer.msg(data.retMsg,{icon:1,time:2000});	
+                    }
+                },
+                error: function () {
+                    alert("上传失败！");
+                }
+            });
+        });
+		
+		var modelList =  $('#modelList').DataTable({
+			ajax : basePath + "activiti/modelList",
+			columns : [{
+				data : "id",
+				"sDefaultContent" : ""
+			}, {
+				data : "name",
+				"sDefaultContent" : ""
+			}, {
+				data : "version",
+				"sDefaultContent" : ""
+			}, {
+				data : "createTime",
+				"sDefaultContent" : ""
+			}, {
+                 "sClass": "center",
+                 "data": null,
+                 "orderable": false,  
+                 "render": function (data, type, full, meta) {
+            		 return '<a style="text-decoration:none" class="ml-5" href="' + basePath + 'editor?modelId=' + data.id + '" title="查看"><i class="Hui-iconfont">&#xe6df;</i></a> '
+            		 + '<a style="text-decoration:none" class="ml-5" href="javascript:;" onClick="del(this,\'' + 'models/' + data.id + '\')" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>'
+            		 + '<a style="text-decoration:none" class="ml-5" href="javascript:;" onClick="deploy(this,\'' + 'models/' + data.id + '/deployment\')" title="发布"><i class="Hui-iconfont">&#xe6df;</i></a>';
+            	 }
+            }],
+            "aoColumnDefs": [
+          	  {"orderable":false,"aTargets":[4]}// 不参与排序的列
+          	],
+			language:{ "sEmptyTable": "数据为空" }
+		});
+		
+		var deploymentList =  $('#deploymentList').DataTable({
+			ajax : basePath + "activiti/deploymentList",
+			columns : [{
+				data : "id",
+				"sDefaultContent" : ""
+			}, {
+				data : "name",
+				"sDefaultContent" : ""
+			},{
+				data : "deploymentTime",
+				"sDefaultContent" : ""
+			}, {
+                 "sClass": "center",
+                 "data": null,
+                 "orderable": false,  
+                 "render": function (data, type, full, meta) {
+            		 return '<a style="text-decoration:none" class="ml-5" href="javascript:;" onClick="del(this,\'' + 'deployments/' + data.id + '\')" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>';
+            	 }
+            }],
+            "aoColumnDefs": [
+          	  {"orderable":false,"aTargets":[3]}// 不参与排序的列
+          	],
+			language:{ "sEmptyTable": "数据为空" }
+		});
+	});
+	
+	/*删除*/
+	function del(obj, url){
+		layer.confirm('确认要删除吗？',function(index){
+			jQuery.ajax({
+				type : 'delete',
+				url : basePath + url,
+				success: function(data){
+					if (data.result) {
+						$(obj).parents("tr").remove();
+						layer.msg('删除成功!',{icon:1,time:1000});
+					} else {
+						layer.msg(data.retMsg,{icon:1,time:1000});
+					}
+				},
+				error:function(data) {
+					layer.msg('删除失败!',{icon:1,time:1000});
+					console.log(data.msg);
+				},
+			});		
+		});
+	}
+	/*发布*/
+	function deploy(obj, url){
+		jQuery.ajax({
+			type : 'post',
+			url : basePath + url,
+			success: function(data){
+				if (data.result) {
+					layer.msg('发布成功!',{icon:1,time:1000});
+					$('.btn-refresh').click();
+				} else {
+					layer.msg(data.retMsg,{icon:1,time:1000});
+				}
+			},
+			error:function(data) {
+				layer.msg('发布失败!',{icon:1,time:1000});
+				console.log(data.msg);
+			},
+		});		
+	}
+	
+	</script>
+
+</body>
+</html>

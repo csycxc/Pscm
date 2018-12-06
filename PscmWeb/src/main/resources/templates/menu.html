@@ -1,0 +1,124 @@
+﻿<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+<link rel="stylesheet" th:href="@{/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css}" type="text/css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/themes/default/easyui.css}">
+
+<title>施工项目现场控制与管理系统</title>
+</head>
+<body class="easyui-layout" style="top:-28px;">
+<input type="hidden" id="staticDivSnCode">
+<input type="hidden" id="staticDivItemCode">
+<div data-options="region:'west',split:true,title:'West'" style="width:200px;padding:10px;">
+	<ul id="proj_tree" class="ztree"></ul>
+</div>
+<div data-options="region:'center'">
+	<div class="easyui-layout" data-options="fit:true">  
+		<div id="iframe_box$prCode" class="Hui-article">
+			<div class="show_iframe">
+				<iframe scrolling="yes" frameborder="0" th:src="${defmenuUrl}" th:name="'mainframe'+${prCode}" th:id="'mainframe'+${prCode}"></iframe>
+		</div>
+	</div>
+</div>
+</div>
+
+<script type="text/javascript" th:src="@{/lib/jquery/1.9.1/jquery.min.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+<script type="text/javascript" th:src="@{/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.contextmenu/jquery.contextmenu.r2.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+<script th:inline="javascript">
+
+var setting = {
+	view: {
+		dblClickExpand: false,
+		showLine: false,
+		selectedMulti: false,
+		showIcon: false,
+		fontCss: {'color':'black','font-size':'20px'}
+	},
+	data: {
+		simpleData: {
+			enable:true,
+			idKey: "id",
+			pIdKey: "pId",
+			rootPId: ""
+		}
+	},
+	callback: {
+		beforeClick: function(treeId, treeNode) {
+			var zTree = jQuery.fn.zTree.getZTreeObj("proj_tree");
+			if (treeNode.isParent) {
+				zTree.expandNode(treeNode);
+				return false;
+			} else {
+				if (treeNode.url.indexOf("?") == -1) {
+					$("#" + treeNode.tId + "_a").attr("href", treeNode.url + "?divSnCode=" + $("#staticDivSnCode").val() + "&divItemCode=" + $("#staticDivItemCode").val());
+				}
+				//treeNode.url = treeNode.url + "?divCode=" + $("#staticDivCode").val();
+				//$('#mainframe$prCode').attr("src",treeNode.url + "?divCode=" + $("#staticDivCode").val());
+				return true;
+			}
+		}
+	},
+	//dataFilter: filter
+};
+
+
+		
+		
+$(document).ready(function(){
+	var t = $("#proj_tree");
+	t = jQuery.fn.zTree.init(t, setting, /*[[${menuNode}]]*/);
+	var zTree = jQuery.fn.zTree.getZTreeObj("proj_tree");
+});
+
+
+
+function myselfinfo(){
+	layer.open({
+		type: 1,
+		area: ['300px','200px'],
+		fix: false, 
+		maxmin: true,
+		shade:0.4,
+		title: '查看信息',
+		content: '<div>信息</div>'
+	});
+}
+
+
+function displaynavbar(obj){
+	if($(obj).hasClass("open")){
+		$(obj).removeClass("open");
+		$("body").removeClass("big-page");
+	} else {
+		$(obj).addClass("open");
+		$("body").addClass("big-page");
+	}
+}
+
+function displaymenubar(obj){
+	if($(obj).hasClass("open")){
+		$(obj).removeClass("open");
+		$("body").removeClass("big-page-right");
+	} else {
+		$(obj).addClass("open");
+		$("body").addClass("big-page-right");
+	}
+}
+</script>	
+</body>
+</html>

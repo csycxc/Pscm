@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Pscm.iml" filepath="$PROJECT_DIR$/Pscm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmAccount/PscmAccount.iml" filepath="$PROJECT_DIR$/PscmAccount/PscmAccount.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmConf/PscmConf.iml" filepath="$PROJECT_DIR$/PscmConf/PscmConf.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmContract/PscmContract.iml" filepath="$PROJECT_DIR$/PscmContract/PscmContract.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmEngsafety/PscmEngsafety.iml" filepath="$PROJECT_DIR$/PscmEngsafety/PscmEngsafety.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmLabour/PscmLabour.iml" filepath="$PROJECT_DIR$/PscmLabour/PscmLabour.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmPersist/PscmPersist.iml" filepath="$PROJECT_DIR$/PscmPersist/PscmPersist.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmSchedule/PscmSchedule.iml" filepath="$PROJECT_DIR$/PscmSchedule/PscmSchedule.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmService/PscmService.iml" filepath="$PROJECT_DIR$/PscmService/PscmService.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmTender/PscmTender.iml" filepath="$PROJECT_DIR$/PscmTender/PscmTender.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmUtil/PscmUtil.iml" filepath="$PROJECT_DIR$/PscmUtil/PscmUtil.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmWeb/PscmWeb.iml" filepath="$PROJECT_DIR$/PscmWeb/PscmWeb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PscmWorkflow/PscmWorkflow.iml" filepath="$PROJECT_DIR$/PscmWorkflow/PscmWorkflow.iml" />
+    </modules>
+  </component>
+</project>

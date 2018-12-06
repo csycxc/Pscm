@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>配置工程信息</title>
+   	<link rel="stylesheet" type="text/css" th:href="@{/css/easyui.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/icon.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/demo.css}">
+	
+
+   	<script type="text/javascript" th:src="@{/js/jquery-1.4.4.min.js}"></script>
+
+	<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+</head>
+
+<body>
+<BR>
+	<table align=center>
+	<tr><td>
+		<div style="margin:auto"></div>
+		<div class="easyui-panel" title="配置工程信息" style="width:800px;max-width:800px;padding:20px 20px;margin:auto">
+			<form id="engineering_form" method="post" action="/engineering/saveengineering">
+				<div style="margin-bottom:8px">
+					<input class="easyui-textbox" id="engCode" name="engCode" style="width:30%" data-options="label:'工程编码:',readonly:true" th:value="*{engCode}">(保存时后台会自动生成工程编码)
+				</div>
+				<div style="margin-bottom:8px">
+					<input class="easyui-textbox" name="tenantCode" style="width:30%" data-options="label:'租户编码:',required:true,readonly:true" th:value="*{tenantCode}">
+				</div>
+				
+				<div style="margin-bottom:8px"><!--  下面的列表需要动态获取，依赖pscm 枚举/常量 服务 -->
+					<select class="easyui-combobox" label="*工程分类:" style="width:30%" name="engType" data-options="editable:false,panelHeight:'auto'">
+					    <option value="1"  th:selected="${engType==1}"  >铁路工程</option>
+						<option value="2"  th:selected="${engType==2}" >公路工程</option>
+						<option value="3"  th:selected="${engType==3}"  >市政工程</option>
+						<option value="4"  th:selected="${engType==4}"  >房建工程</option>
+						<option value="5"  th:selected="${engType==5}"  >轨道工程</option>
+						<option value="6"  th:selected="${engType==6}"  >水利工程</option>
+						<option value="7"  th:selected="${engType==7}"  >其他工程</option>
+					</select>
+				</div>
+				
+				<div style="margin-bottom:8px">
+					<input class="easyui-textbox" name="engName" style="width:90%;height:40px" data-options="label:'*工程简称:',required:true, multiline:true"  th:value="*{engName}">
+				</div>		
+				
+				<div style="margin-bottom:8px">
+					<input class="easyui-textbox" name="engFullName" style="width:90%;height:40px" data-options="label:'*工程全称:',required:true, multiline:true"  th:value="*{engFullName}">
+				</div>			
+				
+				<div style="margin-bottom:8px">
+					<input class="easyui-textbox" name="engAddress" style="width:90%;height:40px" data-options="label:'*工程地点:',required:true, multiline:true" th:value="*{engAddress}">
+				</div>			
+							
+				<div style="margin-bottom:8px">
+					<input class="easyui-textbox" name="engSurvey" style="width:90%;height:60px" data-options="label:'*工程概况:',required:true, multiline:true" th:value="*{engSurvey}">
+				</div>	
+				
+				
+				<div style="margin-bottom:8px">
+					<input class="easyui-numberbox"  precision="2" name="contractPrice" style="width:40%" data-options="label:'*合同价:',required:true" th:value="*{contractPrice}">
+				</div>
+				
+				<div style="margin-bottom:8px">
+					<input class="easyui-numberbox"  precision="2" name="budget" style="width:40%" data-options="label:'*预算:',required:true"  th:value="*{budget}">
+				</div>
+				
+				<div style="margin-bottom:8px">
+					<input class="easyui-numberbox"  precision="2" name="payRationThreshold" style="width:40%" data-options="label:'*付款比例阈值:',required:true" th:value="*{payRationThreshold}" >
+				</div>
+				
+				<!--  暂时注释，等有明确定义后打开显示 				
+				<div style="margin-bottom:8px">
+					<input class="easyui-textbox" name="status" style="width:40%" data-options="label:'状态:',readonly:true" th:value="*{status}">
+				</div>
+				-->
+				
+				<div style="margin-bottom:8px">
+					<select class="easyui-combobox"  label="* 配置源:" style="width:40%" name="confSource" data-options="editable:false,panelHeight:'auto'">					
+						<option th:each="item : ${MajorSourceArray}"
+							th:value="${item.major_en} + '_' + ${item.source_en}" 
+							th:selected="${confSource==(item.major_en+ '_'+item.source_en)}" 
+							th:text="${item.major}+ '-' + ${item.source}"></option>
+					</select>	(此配置源设定后，不可更改，请谨慎选择)
+				</div>
+								
+			</form>
+			<div style="text-align:center;padding:6px 0">
+				<a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()" style="width:80px">保存</a>
+				
+			</div>
+		</div>
+	</td></tr></table>
+	
+    <script>
+    /**
+     *
+     * RestAPI 调用保存工程信息
+     * 成功时候，返回新的工程编号，并更新表单中的值
+     * 如果失败，将后台的错误消息返回给客户，用消息框显示提示客户出错
+     *
+     */
+        function submitForm(){
+        	console.log("submitForm...")
+              $.ajax({
+                async: false,
+                type: "POST",
+                url:'/engineering/saveengineering',
+                contentType : "application/x-www-form-urlencoded; charset=utf-8",
+                data:$("#engineering_form").serialize(),
+                dataType: "text",
+                success: function (data) {
+                	console.log(data)
+                	$("#engCode").textbox("setValue",data);
+                	alert("保存项目成功，工程编号为"+data)
+                  },
+                error: function (data) {
+                	console.log(data.responseText)
+                	alert("提交出错:"+data.responseText)
+                }
+            })
+        }
+    	
+        
+    </script>
+</body>
+</html>

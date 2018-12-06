@@ -1,0 +1,778 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>劳务进场培训</title>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/semantic.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/dataTables.semanticui.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/buttons.dataTables.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/select.dataTables.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/themes/default/easyui.css}"/>
+
+	<link rel="stylesheet" type="text/css" th:href="@{/editor-app/libs/bootstrap_3.1.1/css/bootstrap.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-editable.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/select2/select2-bootstrap.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/select2/select2.min.css}" />
+
+	<script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+	<script type="text/javascript" th:src="@{/js/jquery.mockjax.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/dataTables.select.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/dataTables.buttons.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+	<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+	<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+
+	<script type="text/javascript" th:src="@{/js/bootstrap-editable.js}"></script>
+	<script type="text/javascript" th:src="@{/js/bootstrap-table.js}"></script>
+	<script type="text/javascript" th:src="@{/js/bootstrap-table-editable.js}"></script>
+	<script type="text/javascript" th:src="@{/js/showPhoto.js}"></script>
+	<script type="text/javascript" th:src="@{/select2/select2.full.min.js}"></script>
+
+	<style>
+		.option_show{height: 28px;width: 80px;}
+		.option_div{float:left;margin-top: 13px;margin-left:15px;padding-right: 40px;font-size: 16px;}
+		.a-link{color: #0066CC;}
+		#img{width:400px;height:300px;border:black 1px solid;}
+		#image{position: absolute;display: none;z-index:9998;}
+		#photo_dialog{z-index:9999;}
+	</style>
+</head>
+<body class="easyui-layout">
+<!-- 左侧页面 -->
+<div data-options="region:'west',split:true"  style="width:70%;">
+	<div class="cl pd-3 bg-1 bk-gray">
+		<div class="option_div">
+			合同名称：<select name="contract" id="contract" class="contract_option option_show" onchange="contract_select()" style="margin-right: 25px;width: 200px;" value=""></select>
+		</div>
+		<span class="r" style="margin-top: 10px;margin-bottom: 15px;">
+			<a href="javascript:;" onclick="contract_add()" class="btn btn-primary radius">增加培训记录</a>
+		</span>
+		<!--<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="btn-refresh Hui-iconfont">&#xe68f;</i></a>-->
+	</div>
+	<table id="train_table" class="display" cellspacing="0" align=center width="100%" style="table-layout:fixed">
+		<thead>
+			<tr>
+				<th style="width:100px;">培训编号</th>
+				<th style="width:100px;">乙方</th>
+				<th style="width:100px;">合同名称</th>
+				<th style="width:100px;">作业队</th>
+				<th style="width:50px;">培训人</th>
+				<th style="width:80px;">培训时间</th>
+				<th style="width:100px;">培训地点</th>
+				<th style="width:100px;">备注</th><!-- 替换备注 <th>人数</th> -->
+				<th style="width:60px;">操作</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+<!-- 右侧页面 -->
+<div data-options="region:'center'" >
+	<div id="reload-train" th:replace="labour/train-edit::trainframe"></div>
+	<div id="reload-attachment" th:replace="labour/train-edit::attachmentframe"></div>
+	<hr style="border: 1px solid #b3b3b3; width: 100%;"/><!-- 分割线 -->
+	<div id="reload-labor" th:replace="labour/train-edit::laborframe"></div>
+</div>
+<!-- 上传附件 -->
+<div id="upload_dialog" class="easyui-dialog" title="上传培训附件" style="width:350px;height:150px;"
+	 data-options="iconCls:'icon-save',resizable:true, modal: true, closed:true">
+	<input id="file" type="file">
+	<button class="btn btn-primary" id="upload">上传</button>
+</div>
+<div id="image">
+	<img src="" alt="" id="img">
+</div>
+<div id="photo_dialog" class="easyui-dialog" title="拍照" style="width:700px;height:600px;" data-options="iconCls:'icon-save',resizable:true, modal: true, closed:true">
+
+	<input type="text" class="input-text" id="in_id_photo" style="display: none;" value=""><!--这里放inId-->
+	<input type="text" class="input-text" id="string_photo" style="display: none;" value=""><!--这里放属性名称-->
+
+	<video id="video" width="640" height="480" autoplay></video><!--<button id="snap" >拍照</button>-->
+	<button id="save" style="height:30px;width:60px;font-size:10px;margin-left: 500px;">保存</button>
+	<canvas id="canvas" width="640" height="480" style="float:right;border:1px solid #000;display: none;"></canvas>
+</div>
+<script th:inline="JavaScript">
+    var basePath = "/";	//基本路径
+    var attachmentList;	//上传list
+    var trainAttach;    //培训附件集合
+	var downContractCode;//当前合同编码
+
+    $(document).ready(function() {
+        $.fn.dataTable.ext.errMode = 'none'; // disable the error message box
+
+		//获取wageModel， wageUnitPrice , wageUmint 三个属性（枚举表里面）
+
+        //获取合同下拉框内容
+        jQuery.ajax({
+            type:"post",
+            url: basePath + "labor/getcontract",
+            dataType:"json",
+            async : false,//非异步，不跳过
+            success:function(data){
+                var contractHtml = '';
+                for(var i=0;i<data.contract.length;i++){
+                    contractHtml += '<option class="contract" value="'+ data.contract[i].downContractCode +'">' + data.contract[i].contractName + '</option>';
+                }
+                $('#contract').append(contractHtml);
+            }
+        });
+        //初始化id为train的datatable
+        $('#train_table').DataTable({
+            ajax : basePath + "train/gettrains?downContractCode=" + $("#contract").val(),
+            "searching" : false,//去掉搜索框方法一
+            "bLengthChange" : false,//去掉每页显示多少条数据方法
+            "paging" : false,//禁止分页
+            "scrollX": true,//横向滚动条
+            "autoWidth":true,
+            language:{ "sEmptyTable": "数据为空" },
+            columns : [
+                {data : "trainCode","sDefaultContent" : ""},
+                {data : "contractPartSecond","sDefaultContent" : ""},
+                {data : "contractName", "sDefaultContent" : ""},
+                {data : "constructionTeam", "sDefaultContent" : ""},
+                {data : "trainer", "sDefaultContent" : ""},
+                {data : "trianDate", "sDefaultContent" : ""},
+                {data : "trainAddress", "sDefaultContent" : ""},
+                {data : "remark", "sDefaultContent" : ""},
+                {
+                    "sClass": "center",
+                    "data": null,
+                    "orderable": false,
+                    "render": function (data, type, full, meta) {
+                        if(data.trainCode == "" || data.trainCode == null){
+                            return '<a style="text-decoration:none" class="ml-5"></a>';
+                        }else{
+                            return '<a style="text-decoration:none;" class="ml-5" onClick="trainCode_del(this,\'' + data.trainCode + '\')" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>'
+                                +'<a style="text-decoration: none;" class="ml-5" onClick="updateTrain(this,\'' + data.trainCode + '\')" href="javascript:;" title="修改"><i class="Hui-iconfont">&#xe6df;</i></a>'
+								+'<a style="text-decoration: none;" class="ml-5" onClick="selectLabors(this,\'' + data.trainCode + '\')" href="javascript:;" title="查看人员"><i class="Hui-iconfont">&#xe667;</i></a>'
+                                +'<a style="text-decoration: none;" class="ml-5" onClick="addLabor(this,\'' + data.trainCode + '\')" href="javascript:;" title="新增人员"><i class="Hui-iconfont">&#xe600;</i></a>';
+                        }
+                    }
+                }],
+            "aoColumnDefs": [
+                {"orderable":false,"aTargets":[7]}// 不参与排序的列
+            ]
+        });
+		//获取  工资模式、工资单位、工资单价 下拉框内容
+        jQuery.ajax({
+            type:"post",
+            url: basePath + "labor/getEnumVar",
+            dataType:"json",
+            async : false,//非异步，不跳过
+            success:function(data){
+                var wageModelHtml = '<option class="wageModel" value="">请选择</option>';
+                for(var i=0;i<data.wageModel.length;i++){
+                    wageModelHtml += '<option class="wageModel" value="'+ data.wageModel[i].enumValue +'">' + data.wageModel[i].enumValueName + '</option>';
+                }
+                $('#wageModel').append(wageModelHtml);
+                var wageUmintHtml = '<option class="wageUmint" value="">请选择</option>';
+                for(var i=0;i<data.wageUmint.length;i++){
+                    wageUmintHtml += '<option class="wageUmint" value="'+ data.wageUmint[i].enumValue +'">' + data.wageUmint[i].enumValueName + '</option>';
+                }
+                $('#wageUmint').append(wageUmintHtml);
+                var wageUnitPriceHtml = '<option class="wageUnitPrice" value="">请选择</option>';
+                for(var i=0;i<data.wageUnitPrice.length;i++){
+                    wageUnitPriceHtml += '<option class="wageUnitPrice" value="'+ data.wageUnitPrice[i].enumValue +'">' + data.wageUnitPrice[i].enumValueName + '</option>';
+                }
+                $('#wageUnitPrice').append(wageUnitPriceHtml);
+            }
+        });
+
+        //上传合同附件 按钮
+        $(".btn-upload").click(function () {
+            if ($("#trainCode").val() != "") {
+                $("#upload_dialog").dialog("open");
+            }
+            //console.log("upload click");
+        });
+        //选择好附件后，上传按钮
+        $("#upload").click(function () {
+            var formdata = new FormData();
+            formdata.append("file", $("#file")[0].files[0]);
+            formdata.append("trainCode",$("#trainCode").val());
+            $.ajax({
+                url: basePath + 'train/uploadtrain',
+                type: 'post',
+                data: formdata,
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data === "success") {
+                        //location.reload();
+                        $("#upload_dialog").dialog("close");
+                        layer.msg('添加成功，刷新页面后显示!',{icon:1,time:2000});
+                    }
+                }
+            });
+        });
+        //保存（培训记录详细信息）
+        $("#save_trainForm").click(sava_trainForm);
+		//保存（劳务人员详细信息）
+        $("#sava_laborForm").click(sava_laborForm);
+        //重置（培训记录详细信息）
+        $("#reset_trainForm").click(reset_trainForm);
+		//重置（劳务人员详细信息）
+        $("#reset_laborForm").click(reset_laborForm);
+        //查询 按钮 （人员信息）
+        $("#labor_select").click(labor_select);
+
+        //图片上传按钮
+        $("#idPhoto").change(function(){
+            var objUrl = getObjectURL(this.files[0]) ;//获取文件信息
+            //console.log("objUrl = "+objUrl) ;
+            if (objUrl) {
+                $("#idPhotoImg").attr("src", objUrl) ;
+            }
+        }) ;
+        $("#inIdPhoto").change(function(){
+            var objUrl = getObjectURL(this.files[0]) ;//获取文件信息
+            //console.log("objUrl = "+objUrl) ;
+            if (objUrl) {
+                $("#inIdPhotoImg").attr("src", objUrl) ;
+            }
+        }) ;
+
+
+    })
+
+    //保存培训记录信息
+    function sava_trainForm() {
+        var data = {};
+        data.trainCode = $("#trainCode").val();
+        data.downContractCode = $("#contract").val();
+        data.constructionTeam = $("#constructionTeam").val();
+        data.trainer = $("#trainer").val();
+        data.trianDate = $("#trianDate").val();
+        data.trainAddress = $("#trainAddress").val();
+        data.trainConntent = $("#trainConntent").val();
+        $.ajax({
+            url: basePath+"train/savetrainform",
+            type:"post",
+            data:data,
+            success:function(data){
+                if (data.msg === 'success') {
+                    alert("保存成功!");
+                    //location.replace(location.href);
+                }
+            },
+            error:function(e){
+                layer.msg(e+'保存失败!',{icon:1,time:2000});
+            }
+        });
+    }
+    //保存入出场信息
+    function sava_laborForm() {
+        var idNumber = $("#idNumber").val();
+        var wageModel = $("#wageModel").val();
+        var wageUnitPrice = $("#wageUnitPrice").val();
+        var wageUmint = $("#wageUmint").val();
+        if(wageModel == "" || wageModel == null || wageModel == undefined ||
+            wageUnitPrice == "" || wageUnitPrice == null || wageUnitPrice == undefined ||
+            wageUmint == "" || wageUmint == null || wageUmint == undefined ||
+            idNumber == "" || idNumber == null || idNumber == undefined
+        ){
+            layer.msg('带红星号的为必填项!',{icon:1,time:2000});
+			return;
+		}
+
+        var formdata = new FormData();
+        formdata.append("downContractCode",$("#contract").val());
+		formdata.append("trainCode",$("#laborForm-trainCode").val());
+		formdata.append("idNumber",$("#idNumber").val());
+		formdata.append("inId",$("#inId").val());
+		formdata.append("name",$("#name").val());
+		formdata.append("sex",$("input[name='sex']:checked").val());
+		formdata.append("height",$("#height").val());
+		formdata.append("weigh",$("#weigh").val());
+		formdata.append("birthday",$("#birthday").val());
+		formdata.append("educationDegree",$("#educationDegree").val());
+		formdata.append("workerType",$("#workerType").val());
+		formdata.append("inDate",$("#inDate").val());
+		formdata.append("address",$("#address").val());
+		formdata.append("examScore",$("#examScore").val());
+        formdata.append("wageModel",$("#wageModel").val());
+        formdata.append("wageUnitPrice",$("#wageUnitPrice").val());
+        formdata.append("wageUmint",$("#wageUmint").val());
+		formdata.append("idPhoto", $("#idPhoto")[0].files[0]);
+		formdata.append("inIdPhoto", $("#inIdPhoto")[0].files[0]);
+        //console.log(data);
+        $.ajax({
+            url: basePath + "labor/savelaborform",
+            type:"POST",
+            dataType:"json",
+            data:formdata,
+            contentType: false, //不设置内容类型(提交图片必须加这两个属性)
+            processData: false, //不处理数据
+            success:function(data){
+                if (data.msg === 'success') {
+                    alert("保存成功!");
+                    //location.replace(location.href);
+                }
+            },
+            error:function(e){
+                layer.msg(e+'保存失败!',{icon:1,time:2000});
+            }
+        });
+	}
+	//重置培训记录信息
+	function reset_trainForm() {
+        $("#trainForm")[0].reset();//清空form表单
+        getTrainAttachment('');//清空附件table
+    }
+    //重置入出场信息
+	function reset_laborForm() {
+        $("#laborForm")[0].reset();//清空form表单
+        $("#idPhotoImg").attr("src","");//清空图片显示
+        $("#inIdPhotoImg").attr("src","");//清空图片显示
+        $("input[name=sex][value='1']").attr("checked",true);
+    }
+    //根据身份证查询入出场 按钮
+	function labor_select() {
+        var id_num = $("#idNumber").val();
+        var in_id = $("#inId").val();
+        var trainCode = $("#laborForm-trainCode").val();
+        $("#laborForm")[0].reset();//清空form表单
+        $("#laborForm-trainCode").val(trainCode);
+        jQuery.ajax({
+            type:"post",
+            url: basePath + "labor/getlaborbyidnumber",
+            dataType:"json",
+            data : {"idNumber" : id_num,"inId":in_id},
+            success:function(data){
+                if(data[0].idNumber){
+                    //$("#laborForm-trainCode").val(data[0].trainCode);
+                    $("#idNumber").val(data[0].idNumber);
+                    //$("#inId").val(data[0].inId);//添加了此行，一个人只能有一个培训记录
+                    $("#name").val(data[0].name);
+                    $("input[name=sex][value='1']").attr("checked", data[0].sex == 1 ? true : false);
+        			$("input[name=sex][value='0']").attr("checked", data[0].sex == 0 ? true : false);
+                    //$("#sex").val(data[0].sex);
+                    $("#height").val(data[0].height);
+                    $("#weigh").val(data[0].weigh);
+                    $("#birthday").val(data[0].birthday);
+                    $("#educationDegree").val(data[0].educationDegree);
+                    $("#workerType").val(data[0].workerType);
+                    $("#inDate").val(data[0].inDate);
+                    $("#address").val(data[0].address);
+                    $("#examScore").val(data[0].examScore);
+                    $("#wageModel").val(data.wageModel);//工资模式
+                    $("#wageUnitPrice").val(data.wageUnitPrice);//工资单价
+                    $("#wageUmint").val(data.wageUmint);//工资单位
+                    var imageid;
+                    if(data[0].idPhoto != undefined && data[0].idPhoto!= null){
+                        imageid = "idPhotoImg";
+                        photoShow(data[0].idPhoto,imageid);
+                    }
+                    if(data[0].inIdPhoto != undefined && data[0].inIdPhoto!= null){
+                        imageid = "inIdPhotoImg";
+                        photoShow(data[0].inIdPhoto,imageid);
+                    }
+                }
+            }
+        });
+    }
+
+    /*===================培训记录=========================*/
+
+    //改变合同时直接查询
+    function contract_select(){
+        downContractCode = $("#contract").val();
+        $('#train_table').DataTable().ajax.url( basePath + 'train/gettrains?downContractCode='+downContractCode ).load();
+    }
+    //增加（培训记录）按钮
+    function contract_add(){
+        $("#trainForm")[0].reset();//清空form表单
+        getTrainAttachment('');//清空附件table
+        $("#constructionTeam").prop("readOnly",false);
+
+        var table = $('#train_table').DataTable();
+        var data = table.row(0).data();//获取培训记录table表的第一行的数据填充
+
+        if(data != null && data != undefined){
+            $("#constructionTeam").prop("readOnly",true);
+
+            $("#contractName").val(data.contractName);//合同名称
+            $("#contractPartSecond").val(data.contractPartSecond);//合同乙方
+            $("#constructionTeam").val(data.constructionTeam);//作业队
+        }else{
+			//获取当前选中的合同编码，ajax查询合同及合同乙方。
+            var downContractCode = $('#contract option:selected') .val();
+            jQuery.ajax({
+                type:"post",
+                url: basePath + "contract/down/getDownContract",
+                dataType:"json",
+                data : {"downContractCode" : downContractCode},
+                success:function(data){
+                    //console.log(data);
+                    $("#contractName").val(data.contractName);//合同名称
+                    $("#contractPartSecond").val(data.contractPartSecond.supplierName);//合同乙方(供方名称)
+                    $("#constructionTeam").val(data.constructionTeam);//作业队
+                }
+            });
+		}
+    }
+    //删除（培训记录）
+    function trainCode_del(obj,trainCode){
+        //console.log("trainCode:"+trainCode);
+        layer.confirm('确认要删除吗？',function(index){
+            jQuery.ajax({
+                type: "post",
+                dataType : "json",
+                url: basePath+"train/deletetrain",
+                data : {"trainCode" : trainCode},
+                success: function(data){
+                    //console.log(data);
+                    if(data > 0){
+                        $("#train_table").DataTable().row($(obj).parents("tr")).remove().draw();
+                        layer.msg('删除成功!',{icon:1,time:2000});
+                    }else if (data == -1) {
+                        layer.msg('该培训下有入出场记录，不能删除!',{icon:1,time:2000});
+                    }else {
+                        layer.msg('删除失败!',{icon:1,time:2000});
+					}
+                },
+                error:function(data){
+                    layer.msg('删除失败!',{icon:1,time:2000});
+                }
+            });
+        });
+    }
+    //修改（培训记录）
+	function updateTrain(obj,trainCode){
+        //当前行的数据
+        var data = $('#train_table').DataTable().row($(obj).parents("tr")).data();
+
+        $("#trainCode").val(data.trainCode);//培训编号
+        $("#contractName").val(data.contractName);//合同名称
+        $("#contractPartSecond").val(data.contractPartSecond);//合同乙方
+        $("#constructionTeam").val(data.constructionTeam);//作业队
+        $("#trainer").val(data.trainer);//培训人
+        $("#traininId").val(data.inId);//作业队（入场卡号） id
+        $("#trianDate").val(data.trianDate);//培训时间:备注，这里数据库中字段写成了trian_date
+        $("#trainAddress").val(data.trainAddress);//培训地点
+        $("#trainConntent").val(data.trainConntent);//培训内容
+        //$("#trainCode").val("培训附件");//培训附件
+        $("#trainCode").prop("readOnly",true);
+        $("#contractName").prop("readOnly",true);
+        $("#contractPartSecond").prop("readOnly",true);
+        $("#constructionTeam").prop("readOnly",true);
+        trainAttach = data.trainAttach;
+        //获取附件信息
+        getTrainAttachment(trainAttach);
+	}
+
+
+	//查询培训记录下的受培训人员(展开，关闭)
+    function selectLabors(obj,trainCode){
+        var table = $("#train_table").dataTable();
+        var tr = $(obj).parents("tr");
+        var row = $("#train_table").DataTable().row($(obj).parents("tr"));
+        if ( row.child.isShown() ) {// This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {// Open this row
+            $('.laborTable').remove();
+            row.child( format() ).show();
+            tr.addClass('shown');
+            setLaborInOutTable(row.data().trainCode);
+        }
+        $(".laborTable").DataTable({
+            "searching":false,
+            "paging": false,
+            language:{ "sEmptyTable": "数据为空" }
+        });
+    }
+    function format () {
+        return '<table class="laborTable" cellspacing="0" align=center width="100%" style="table-layout:fixed;border:5px solid gray;"><thead><tr>' +
+            '<th style="width:100px;">身份证号</th><th style="width:100px;">平安卡号</th><th style="width:50px;">姓名</th>'+
+			'<th style="width:30px;">性别</th><th style="width:80px;">出生年月</th><th style="width:30px;">身高</th>'+
+			'<th style="width:30px;">体重</th><th style="width:60px;">文化程度</th><th style="width:30px;">工种</th>'+
+			'<th style="width:80px;">入场时间</th><th style="width:60px;">考试成绩</th><th style="width:50px;">身份证</th>'+
+			'<th style="width:80px;">手持身份证</th><th style="width:100px;">家庭住址</th><th style="width:60px;">操作</th></tr></thead></table>';
+    }
+	function setLaborInOutTable(trainCode) {
+        $('.laborTable').DataTable({
+			ajax : basePath + "laborInOut/selectLaborInOutsByTrainCode?trainCode=" + trainCode,
+            dataType:"json",
+            async : false,//非异步，不跳过
+            "searching" : false,//去掉搜索框方法一
+            "bLengthChange" : false,//去掉每页显示多少条数据方法
+            "paging" : false,//禁止分页
+            "info": false,//取消底部显示总条数
+            "scrollX": true,
+            "autoWidth":true,
+            language:{ "sEmptyTable": "数据为空" },
+            columns : [
+                {data : "idNumber","sDefaultContent" : ""},
+                {data : "inId","sDefaultContent" : ""},
+                {data : "name", "sDefaultContent" : ""},
+                {data : "sex", "sDefaultContent" : "",
+					"render": function ( data, type, full, meta ) {if(data == 0){return '女';}else{return '男';}}
+				},
+                {data : "birthday", "sDefaultContent" : ""},
+                {data : "height", "sDefaultContent" : ""},
+                {data : "weigh", "sDefaultContent" : ""},
+                {data : "educationDegree", "sDefaultContent" : ""},
+                {data : "workerType", "sDefaultContent" : ""},
+                {data : "inDate", "sDefaultContent" : ""},
+                {data : "examScore", "sDefaultContent" : ""},
+                {data : "idPhoto", "sDefaultContent" : "",
+                    "render": function (data, type, full, meta) {
+                        var inId = $('.laborTable').DataTable().row(meta.row).data().inId;
+                        if(data){
+                            return '<a href="#" onmouseover="displayImg(\''+data+'\')" onmouseout="vanishImg()" onmousemove="displayImg(\''+data+'\')" >图片</a>'+
+									'<input class="idPhotoButton" type="button" value="重拍" onclick="idPhotoButtonClick(\'' + inId + '\');">';
+                        }else{
+                            return '<input class="idPhotoButton" type="button" value="拍照" onclick="idPhotoButtonClick(\'' + inId + '\');">';
+                        }
+                    }
+                },
+                {data : "inIdPhoto", "sDefaultContent" : "",
+                    "render": function ( data, type, full, meta ) {
+                        var inId = $('.laborTable').DataTable().row(meta.row).data().inId;
+                        if(data){
+                            return '<a href="#" onmouseover="displayImg(\''+data+'\')" onmouseout="vanishImg()" onmousemove="displayImg(\''+data+'\')" >图片</a>'+
+                               		'<input class="inIdPhotoButton" type="button" value="重拍" onclick="inIdPhotoButtonClick(\'' + inId + '\');">  ';
+                        }else{
+                            return '<input class="inIdPhotoButton" type="button" value="拍照" onclick="inIdPhotoButtonClick(\'' + inId + '\');">  ';
+						}
+                    }
+                },
+                {data : "address", "sDefaultContent" : ""},
+                {
+                    "sClass": "center",
+                    "data": null,
+                    "orderable": false,
+                    "render": function (data, type, full, meta) {
+                        if(data.inId == "" || data.inId == null){
+                            return '<a style="text-decoration:none" class="ml-5"></a>';
+                        }else{
+                            return '<a style="text-decoration:none" class="ml-5" onClick="inId_del(this,\'' + data.inId + '\',\'' + data.inIdPhoto + '\')" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>'
+                                +'<a style="text-decoration: none;" class="ml-5" onClick="inId_update(this,\'' + data.inId + '\')" href="javascript:;" title="修改"><i class="Hui-iconfont">&#xe6df;</i></a>';
+                        }
+                    }
+                }],
+            "aoColumnDefs": [
+                {"orderable":false,"aTargets":[11]}// 不参与排序的列
+            ]
+        });
+    }
+
+
+    /*===================入出场记录=======================*/
+
+
+    //新增人员入出场信息 按钮点击-清空表单，传递培训id
+	function addLabor(obj,trainCode) {
+        $("#laborForm")[0].reset();//清空form表单
+        $("#idPhotoImg").attr("src","");//清空图片显示
+        $("#inIdPhotoImg").attr("src","");//清空图片显示
+        $("input[name=sex][value='1']").attr("checked",true);//默认男
+		$("#laborForm-trainCode").val(trainCode);
+    }
+    //删除人员入出场信息
+    function inId_del(obj,inId,inIdPhoto){
+	    //console.log("inId is " + inId +" ……and inIdPhoto is "+inIdPhoto);
+	    if(inIdPhoto == 'undefined'){
+            inIdPhoto = "";
+		}
+        layer.confirm('确认要删除吗？',function(index){
+            jQuery.ajax({
+                type: "post",
+                dataType : "json",
+                url: basePath+"laborInOut/deleteLaborInOut",
+                data : {"inId" : inId , "inIdPhoto":inIdPhoto},
+                success: function(data){
+                    //console.log(data);
+                    if(data > 0){
+                        $(".laborTable").DataTable().row($(obj).parents("tr")).remove().draw();
+                        layer.msg('删除成功!',{icon:1,time:2000});
+                    }else if (data == -1) {
+                        layer.msg('该入出记录下的人员有考勤，删除失败!',{icon:1,time:2000});
+                    }else {
+                        layer.msg('删除失败!',{icon:1,time:2000});
+                    }
+                },
+                error:function(data){
+                    layer.msg('删除失败!',{icon:1,time:2000});
+                }
+            });
+        });
+	}
+	//修改人员入出场信息按钮===================
+    function inId_update(obj,inId){
+        $("#laborForm")[0].reset();//清空form表单
+        $("#idPhotoImg").attr("src","");//清空图片显示
+        $("#inIdPhotoImg").attr("src","");//清空图片显示
+        //当前行的数据
+        var data = $('.laborTable').DataTable().row($(obj).parents("tr")).data();
+        $("#laborForm-trainCode").val(data.trainCode);//培训编号
+        $("#idNumber").val(data.idNumber);//身份证号
+        $("#inId").val(data.inId);//平安卡号
+        $("#name").val(data.name);//姓名
+        $("input[name=sex][value='1']").attr("checked", data.sex == 1 ? true : false);
+        $("input[name=sex][value='0']").attr("checked", data.sex == 0 ? true : false);
+        //$("#sex").val(data.sex);//性别
+        $("#height").val(data.height);//身高
+        $("#weigh").val(data.weigh);//体重
+        $("#birthday").val(data.birthday);//生日
+        $("#educationDegree").val(data.educationDegree);//文化程度
+        $("#workerType").val(data.workerType);//工种
+        $("#inDate").val(data.inDate);//入场时间
+        $("#address").val(data.address);//家庭住址
+        $("#examScore").val(data.examScore);//考试成绩
+        $("#wageModel").val(data.wageModel);//工资模式
+        $("#wageUnitPrice").val(data.wageUnitPrice);//工资单价
+        $("#wageUmint").val(data.wageUmint);//工资单位
+
+		var imageid;
+		if(data.idPhoto != undefined && data.idPhoto!= null){
+            imageid = "idPhotoImg";
+            photoShow(data.idPhoto,imageid);
+		}
+        if(data.inIdPhoto != undefined && data.inIdPhoto!= null){
+            imageid = "inIdPhotoImg";
+            photoShow(data.inIdPhoto,imageid);
+        }
+    }
+
+    /*===================附件和图片=======================*/
+    //身份证拍照
+    function idPhotoButtonClick(inId) {
+        $("#in_id_photo").val("");
+        $("#string_photo").val("");
+        //打开dialog,js代码在showPhoto.js中。
+        $("#photo_dialog").dialog("open");
+        $("#in_id_photo").val(inId);
+        $("#string_photo").val("idPhoto");
+    }
+	//入场拍照
+    function inIdPhotoButtonClick(inId) {
+        $("#in_id_photo").val("");
+        $("#string_photo").val("");
+        $("#photo_dialog").dialog("open");
+        $("#in_id_photo").val(inId);
+        $("#string_photo").val("inIdPhoto");
+    }
+
+
+    //获取附件信息
+    function getTrainAttachment(trainAttach){
+        if(attachmentList != undefined){
+            //console.log("attachmentList is not undefined");
+            attachmentList.clear().draw();
+            attachmentList.ajax.url(
+                basePath + "contractAtt/getContractAttList?fileInNames=" + (trainAttach == undefined ? '' : trainAttach)
+            ).load();
+        }else{
+            //console.log("attachmentList is undefined");
+            attachmentList = $('#train-attachment').DataTable({
+                "searching" : false,//去掉搜索框方法一
+                "bLengthChange" : false,//去掉每页显示多少条数据方法
+                "paging" : false,//禁止分页
+                language:{ "sEmptyTable": "暂无附件" },
+                ajax : basePath + "contractAtt/getContractAttList?fileInNames=" + (trainAttach == undefined ? '' : trainAttach),
+                columns : [
+                    {data : "actualFileName","sDefaultContent" : ""},
+                    {data : "type","sDefaultContent" : ""},
+                    {
+                        "data": null,
+                        "render": function (data, type, full, meta) {
+                            return '<a style="text-decoration:none" class="ml-5" onClick="downloadFile(\''
+                                + data.location
+                                + '\',\''
+                                + data.actualFileName
+                                + '\')" href="javascript:;" title="下载">下载</a>'
+                                + '<a style="text-decoration: none;" class="ml-5" onClick="deleteFile(this,\''
+                                + data.fileInName
+                                + '\')" href="javascript:;" title="删除">删除</a>'
+                        }
+                    }
+                ]
+            });
+        }
+    }
+    //下载 附件
+    function downloadFile(fileRealPath, fileName) {
+        window.open(basePath + "contractAtt/fileDownload?fileRealPath=" + fileRealPath
+            + "&fileName=" + encodeURI(encodeURI(fileName)));
+    }
+    //删除 附件
+    function deleteFile(obj,indexId) {
+        layer.confirm('确认要删除吗？',function(index){
+            jQuery.ajax({
+                type: "post",
+                dataType : "json",
+                url: basePath+"train/deleteContractAtt",
+                data : {"indexId" : indexId,"trainCode":$("#trainCode").val()},
+                success: function(data){
+                    //console.log(data)
+                    if(data){
+                        $("#train-attachment").DataTable().row($(obj).parents("tr")).remove().draw();
+                        layer.msg('删除成功!',{icon:1,time:2000});
+                    }else{
+                        layer.msg('删除失败!',{icon:1,time:2000});
+                    }
+                },
+                error:function(data){
+                    //console.log("error ,dataToString:"+data);
+                    //layer.msg('删除失败!',{icon:1,time:2000});
+                    $("#train-attachment").DataTable().row($(obj).parents("tr")).remove().draw();
+                    layer.msg('删除失败!',{icon:1,time:2000});
+                }
+            });
+        });
+    }
+    //获取照片文件信息
+    function getObjectURL(file) {
+        var url = null ;
+        if (window.createObjectURL!=undefined) { // basic
+            url = window.createObjectURL(file) ;
+        } else if (window.URL!=undefined) { // mozilla(firefox)
+            url = window.URL.createObjectURL(file) ;
+        } else if (window.webkitURL!=undefined) { // webkit or chrome
+            url = window.webkitURL.createObjectURL(file) ;
+        }
+        return url ;
+    }
+    //点击图片，新页面打开查看
+    function lookimg(str) {
+        var newwin=window.open()
+        newwin.document.write("<img src="+str+" />")
+    }
+    //图片显示
+	function photoShow(fileInNames,imageid){
+        $.ajax({
+            type:'post',
+            data:{"fileInNames":fileInNames}, //参数
+            dataType:'json',
+            url: "contractAtt/getContractAttList",
+            success: function(data) {
+                if(data.data[0]){
+                    //console.log(data.data[0].location);
+                    $("#"+imageid).attr("src",data.data[0].location);
+                }
+            },
+            error:function(data){
+                alert('响应失败！');
+            }
+        });
+	}
+
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script>
+</body>

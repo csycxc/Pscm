@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>合同编辑</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+</head>
+<body>
+<article class="page-container">
+    <div th:fragment="edit">
+        <form class="form form-horizontal" id="settleAccountInfo" name="settleAccountInfo"
+              method="post" action="/settleAccount/saveSettleAccount">
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2">结算编号：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="settleCode" name="settleCode"
+                           class="input-text" readonly="readonly"></div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>结算名称:</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="settleName" name="settleName" class="input-text"
+                           required="required">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>结算单位:</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="settleUnit" name="settleUnit" class="input-text"
+                           required="required">
+                </div>
+                <label class="form-label col-xs-3 col-sm-2">合同编号：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="downContractCode" name="downContractCode"
+                           class="input-text" readonly="readonly"></div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2">合同名称：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractName" name="contractName"
+                           class="input-text" readonly="readonly"></div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>结算日期:</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="settleDate" name="settleDate" class="input-text Wdate"
+                           required="required" onfocus="WdatePicker({ dateFmt:'yyyy-MM-dd'})">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2">合同乙方：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractPartSecond" name="contractPartSecond"
+                           class="input-text" readonly="readonly"></div>
+                <label class="form-label col-xs-3 col-sm-2">合同总价:</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="contractAmount" name="contractAmount" class="input-text"
+                           readonly="readonly">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>本次实付金额：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="curActualPayAmount" name="curActualPayAmount"
+                           class="input-text" required="required"></div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>本次应付金额:</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="curPayableAmount" name="curPayableAmount" class="input-text"
+                           required="required">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>累计结算金额：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="sumSettleAmount" name="sumSettleAmount"
+                           class="input-text" required="required"></div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>累计剩余金额:</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="sumSurplusAmount" name="sumSurplusAmount" class="input-text"
+                           required="required">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>累计实付金额：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="sumActualPayAmount" name="sumActualPayAmount"
+                           class="input-text" required="required"></div>
+                <label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>累计应付金额:</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <input type="text" value="" placeholder="" id="sumPayableAmount" name="sumPayableAmount" class="input-text"
+                           required="required">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-2">结算类型：</label>
+                <div class="formControls col-xs-3 col-sm-4">
+                    <select id="settleType" name="settleType" class="option_show">
+                        <option value="1">过程计价</option>
+                        <option value="2">末次计价</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3 col-sm-4">用于重新生成的结算ID：</label>
+                <div class="formControls col-xs-3 col-sm-8">
+                    <input type="text" value="" placeholder="" id="recreateSettleCode" name="recreateSettleCode"
+                           class="input-text">
+                </div>
+            </div>
+
+
+            <div style="text-align: center">
+                <button class="btn btn-success btn_save" type="submit">保存</button>
+                <button class="btn btn-default" type="reset">重置</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:fragment="view" style="margin-top: 10px;">
+
+        <div style="width: 100%; text-align: right">
+            <button class="btn btn-default btn-generate">生成审批文件</button>
+            <button class="btn btn-default btn-template">查看审批模板</button>
+        </div>
+
+
+        <br>
+
+        <div style="width: 100%">
+            <label for="contract-attachment">合同附件:</label>
+            <button class="btn btn-default btn-upload" style="float: right;">上传合同附件</button>
+        </div>
+
+        <table id="contract-attachment" cellspacing="0" border="1" class="ui celled table"
+               width="100%" align=center>
+            <thead>
+                <tr>
+                    <th>文件名</th>
+                    <th>类型</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div style="width: 100%">
+            <label for="contract-checkRecord">审批记录:</label>
+        </div>
+        <table id="contract-checkRecord" border="1" class="ui celled table"
+               cellspacing="0" width="100%" align="center">
+            <thead>
+                <tr>
+                    <th>操作类型</th>
+                    <th>执行角色及人</th>
+                    <th>时间</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</article>
+</body>
+<script th:inline="javascript">
+    attachmentList = $("#contract-attachment").DataTable({
+        "searching":false,
+        "info": false,
+        "ordering": false,
+        "paging": false,
+        language:{ "sEmptyTable": "数据为空" }
+    });
+    checkRecordList = $("#contract-checkRecord").DataTable({
+        "searching":false,
+        "info": false,
+        "ordering": false,
+        "paging": false,
+        language:{ "sEmptyTable": "数据为空" }
+    });
+</script>
+</html>

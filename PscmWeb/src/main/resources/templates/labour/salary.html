@@ -1,0 +1,260 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>工资</title>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/semantic.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/dataTables.semanticui.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/buttons.dataTables.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/select.dataTables.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/themes/default/easyui.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/editor-app/libs/bootstrap_3.1.1/css/bootstrap.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-editable.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/select2/select2-bootstrap.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/select2/select2.min.css}" />
+
+	<script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+	<script type="text/javascript" th:src="@{/js/jquery.mockjax.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/dataTables.select.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/dataTables.buttons.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+	<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+	<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+	<script type="text/javascript" th:src="@{/js/bootstrap-editable.js}"></script>
+	<script type="text/javascript" th:src="@{/js/bootstrap-table.js}"></script>
+	<script type="text/javascript" th:src="@{/js/bootstrap-table-editable.js}"></script>
+	<script type="text/javascript" th:src="@{/select2/select2.full.min.js}"></script>
+	<style>
+		.option_show{height: 28px;width: 80px;}
+		.option_div{float:left;margin-top: 13px;margin-left:15px;padding-right: 40px;font-size: 16px;}
+		.a-link{color: #0066CC;}
+	</style>
+</head>
+<body class="easyui-layout">
+<div data-options="region:'west',split:true"  style="width:100%;">
+	<div class="cl pd-3 bg-1 bk-gray">
+		<div class="option_div">
+			合同名称：<select name="contract" id="contract" class="contract_option option_show" onchange="selectTableData()"
+						 style="margin-right: 25px;width: 200px;" value=""></select>
+		</div>
+		<div class="option_div">
+			<div class="row cl">
+				<label class="form-label col-xs-3 col-sm-2">开始月份：</label>
+				<div class="formControls col-xs-3 col-sm-3">
+					<input type="text" value="" onfocus="WdatePicker({ dateFmt:'yyyy-MM',onpicked:selectTableData()})" placeholder="" required="required"
+							  id="startDate" name="startDate" class="input-text Wdate" >
+				</div>
+				<label class="form-label col-xs-3 col-sm-2">结束月份：</label>
+				<div class="formControls col-xs-3 col-sm-3">
+					<input type="text" value="" onfocus="WdatePicker({ dateFmt:'yyyy-MM',onpicked:selectTableData()})" placeholder="" required="required"
+							id="endDate" name="endDate" class="input-text Wdate" >
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="cl pd-3 bg-1 bk-gray">
+		<div class="option_div r">
+			<div class="row cl">
+				<label class="form-label col-xs-3 col-sm-4">生成工资月份：</label>
+				<div class="formControls col-xs-3 col-sm-3">
+					<input type="text" value="" onfocus="WdatePicker({ dateFmt:'yyyy-MM',maxDate:'%y-{%M-1}'})" placeholder="" required="required"
+						   id="createDate" name="createDate" class="input-text Wdate" >
+				</div>
+				<button class="btn btn-default radius btn_search" onclick="addSalary()" >生成此月工资</button>
+			</div>
+		</div>
+	</div>
+	<table id="salary_table" class="display" cellspacing="0" align=center width="100%" style="table-layout:fixed">
+		<thead>
+			<tr>
+				<th style="width:30px;">年月</th>
+				<th style="width:100px;">身份证号</th>
+				<th style="width:100px;">平安卡号</th>
+				<th style="width:50px;">姓名</th>
+				<th style="width:30px;">工种</th>
+				<th style="width:60px;">出勤天数</th>
+				<th style="width:60px;">完成工作量</th>
+				<th style="width:30px;">工资模式</th>
+				<th style="width:30px;">工资单价</th>
+				<th style="width:30px;">工资单位</th>
+				<th style="width:60px;">应发工资</th>
+				<th style="width:60px;">实发工资</th>
+				<th style="width:100px;">备注</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+<script th:inline="javascript">
+    var basePath = "/";	//基本路径
+	var start;
+	var end;
+	var date = new Date();
+
+	var wageModelEnumVar;
+	var wageUmintEnumVar;
+	var wageUnitPriceEnumVar;
+
+    $(document).ready(function() {
+        $.fn.dataTable.ext.errMode = 'none';// disable the error message box
+        //获取合同下拉框内容
+        jQuery.ajax({
+            type:"post",
+            url: basePath + "labor/getcontract",
+            dataType:"json",
+            async : false,//非异步，不跳过
+            success:function(data){
+                var contractHtml = '';
+                for(var i=0;i<data.contract.length;i++){
+                    contractHtml += '<option class="contract" value="'+ data.contract[i].downContractCode +'">' + data.contract[i].contractName + '</option>';
+                }
+                $('#contract').append(contractHtml);
+            }
+        });
+        //获取  工资模式、工资单位、工资单价 下拉框内容
+        jQuery.ajax({
+            type:"post",
+            url: basePath + "labor/getEnumVar",
+            dataType:"json",
+            async : false,//非异步，不跳过
+            success:function(data){
+                if(data){
+                    wageModelEnumVar = data.wageModel;
+                    wageUmintEnumVar = data.wageUmint;
+                    wageUnitPriceEnumVar = data.wageUnitPrice;
+				}
+            }
+        });
+
+        $("#startDate").val(getPreMonth(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()));
+        $("#endDate").val(date.getFullYear() + '-' + (date.getMonth() + 1));
+
+        //初始化id为labor_in_table的datatable
+        $('#salary_table').DataTable({
+            "searching" : false,//去掉搜索框方法一
+            "bLengthChange" : false,//去掉每页显示多少条数据方法
+            "paging" : false,//禁止分页
+            "scrollX": true,
+            "autoWidth":true,
+            language:{ "sEmptyTable": "数据为空" },
+            ajax : basePath + "laborWages/selectSalaryByDownContractCodeAndDate?downContractCode=" + ($("#contract").val() == null ? '' : $("#contract").val())+
+				"&startDate="+($("#startDate").val() == null ? '' : $("#startDate").val())+"&endDate="+($("#endDate").val() == null ? '' : $("#endDate").val()),
+            columns : [
+                {data : "yearMonth", "sDefaultContent" : "",
+                    "render": function ( data, type, full, meta ) {return data.substring(0,7);}
+                },
+                {data : "idNumber","sDefaultContent" : ""},
+                {data : "inId","sDefaultContent" : ""},
+                {data : "name", "sDefaultContent" : ""},
+                {data : "workerType", "sDefaultContent" : ""},
+                {data : "workDays", "sDefaultContent" : ""},
+                {data : "workedLoads", "sDefaultContent" : ""},
+                {data : "wageModel", "sDefaultContent" : "",
+                    "render": function ( data, type, full, meta ) {
+						for(var i=0;i<wageModelEnumVar.length;i++){
+							if(data == wageModelEnumVar[i].enumValue){
+								return wageModelEnumVar[i].enumValueName;
+							}
+						}
+                	}
+				},
+                {data : "wageUnitPrice", "sDefaultContent" : "",
+                    "render": function ( data, type, full, meta ) {
+                        for(var i=0;i<wageUnitPriceEnumVar.length;i++){
+                            if(data == wageUnitPriceEnumVar[i].enumValue){
+                                return wageUnitPriceEnumVar[i].enumValueName;
+                            }
+                        }
+                    }
+				},
+                {data : "wageUmint", "sDefaultContent" : "",
+                    "render": function ( data, type, full, meta ) {
+                        for(var i=0;i<wageUmintEnumVar.length;i++){
+                            if(data == wageUmintEnumVar[i].enumValue){
+                                return wageUmintEnumVar[i].enumValueName;
+                            }
+                        }
+                    }
+				},
+                {data : "grossPay", "sDefaultContent" : ""},
+                {data : "netPay", "sDefaultContent" : ""},
+                {data : "remark", "sDefaultContent" : ""}
+            ]
+        });
+    });
+
+    //改变合同下拉框时，查询该合同下的培训和劳务人员
+    function selectTableData() {
+        start = $("#startDate").val();
+        end = $("#endDate").val();
+        if(start != "" && start != null && start != undefined && end != "" && end != null && end != undefined){
+            $('#salary_table').DataTable().ajax.url(
+                basePath + "laborWages/selectSalaryByDownContractCodeAndDate?downContractCode=" + ($("#contract").val() == null ? '' : $("#contract").val())+
+                "&startDate="+$("#startDate").val()+"&endDate="+$("#endDate").val()
+			).load();
+        }
+    }
+    //生成工资
+	function addSalary() {
+        var downContractCode = $("#contract").val();//合同编号
+        var monthDate = $("#createDate").val();//生成工资的月份
+		//console.log(monthDate)
+		//根据合同编号，查找该合同下的人员出入记录，根据出入记录 查找 该人员下的考勤，根据考勤生成工资。
+		//生成后，刷新该table显示
+		if(downContractCode != "" && downContractCode != null && downContractCode != undefined
+			&& monthDate != "" && monthDate != null && monthDate != undefined){
+            jQuery.ajax({
+                type:"post",
+                url: basePath + "laborWages/createSalary?downContractCode="+downContractCode+"&monthDate="+monthDate,
+                dataType:"json",
+                async : false,//非异步，不跳过
+                success:function(data){
+                    if (data.msg === 'success') {
+                        alert("生成成功!");
+                        selectTableData();
+                    }
+                },
+                error:function(e){
+                    layer.msg(e+'生成失败!',{icon:1,time:2000});
+                }
+            });
+		}
+    }
+    //获取上一个月  的年月
+    function getPreMonth(date) {
+        var arr = date.split('-');
+        var year = arr[0]; //获取当前日期的年份
+        var month = arr[1]; //获取当前日期的月份
+        var day = arr[2]; //获取当前日期的日
+        var days = new Date(year, month, 0);
+        days = days.getDate(); //获取当前日期中月的天数
+        var year2 = year;
+        var month2 = parseInt(month) - 1;
+        if (month2 == 0) {
+            year2 = parseInt(year2) - 1;
+            month2 = 12;
+        }
+        var day2 = day;
+        var days2 = new Date(year2, month2, 0);
+        days2 = days2.getDate();
+        if (day2 > days2) {
+            day2 = days2;
+        }
+        if (month2 < 10) {
+            month2 = '0' + month2;
+        }
+        //var t2 = year2 + '-' + month2 + '-' + day2;//返回年月日
+        var t2 = year2 + '-' + month2;//返回年月
+        return t2;
+    }
+</script>
+</body>

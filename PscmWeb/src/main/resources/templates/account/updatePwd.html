@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+<meta charset="utf-8">
+<link th:href="@{/css/jquery.dataTables.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/semantic.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/dataTables.semanticui.min.css}"
+	rel="stylesheet" type="text/css" />
+
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/semantic.min.js}"></script>
+	
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+<script type="text/javascript" th:src="@{/js/updatePwd.js}"></script>
+<title>修改用户密码</title>
+</head>
+<body>
+<article class="page-container">
+	<form class="form form-horizontal" id="form-ent-add"  method="post">
+	<div class="row cl">
+		<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>原密码：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<input type="password" class="input-text" required="required"  id="oldPwd" name="oldPwd" >
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>新密码：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<input type="password" class="input-text" required="required" id="newPwd" name="newPwd">
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>确认密码：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<input type="password" class="input-text" required="required" id="rePwd" name="rePwd">
+		</div>
+	</div>
+	<div class="row cl">
+		<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+			<input class="btn btn-primary radius" type="button"  id="submit-btn" value="&nbsp;&nbsp;修 改&nbsp;&nbsp;">
+		</div>
+	</div>
+	</form>
+</article>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+var basePath = /*[[@{/}]]*/;  
+$(document).ready(function() {  
+	var  url = basePath + "user/updatePwd";
+	var userCode = [[${#httpServletRequest.remoteUser}]];
+	var checkUrl= basePath + "user/checkPwd";
+	$("#submit-btn").click(function(){
+		var oldPwd = $("#oldPwd").val();
+		var newPwd = $("#newPwd").val();
+		var rePwd = $("#rePwd").val();
+		if(rePwd==newPwd){
+			doUpdatePwd(url, userCode, oldPwd, newPwd);
+		}
+     });
+ 
+	$("#form-ent-add").validate({
+		rules:{
+			oldPwd:{
+				required:true,
+				minlength:3,
+				maxlength:12
+			},
+			newPwd:{
+				required:true,
+				minlength:3,
+				maxlength:12
+			},
+			rePwd:{
+				required:true,
+				minlength:3,
+				maxlength:12,
+				equalTo: "#newPwd"
+			}
+		},
+		
+		messages: {
+			oldPwd: {
+                required: "原密码不能为空",
+                minlength: jQuery.format("密码不能小于3个字符")
+                /* equalTo: "原密码输入有误" */
+            },
+            newPwd: {
+                required: "没有填写密码",
+                minlength: jQuery.format("密码不能小于3个字符")
+            },
+            confirm_password: {
+                required: "没有确认密码",
+                minlength: "确认密码不能小于3个字符",
+                equalTo: "两次输入密码不一致"
+            }
+		}
+	});
+	checkpwd(checkUrl,userCode);
+});
+/*]]>*/
+</script> 
+
+	
+
+<!--/请在上方写此页面业务相关的脚本-->
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script> 
+</body>
+</html>

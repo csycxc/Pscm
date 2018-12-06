@@ -1,0 +1,344 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>考勤</title>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/semantic.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/dataTables.semanticui.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/buttons.dataTables.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/select.dataTables.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/themes/default/easyui.css}"/>
+
+	<link rel="stylesheet" type="text/css" th:href="@{/editor-app/libs/bootstrap_3.1.1/css/bootstrap.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-editable.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/select2/select2-bootstrap.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/select2/select2.min.css}" />
+
+	<script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+	<script type="text/javascript" th:src="@{/js/jquery.mockjax.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/dataTables.select.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/dataTables.buttons.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+	<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+	<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+	<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+
+	<script type="text/javascript" th:src="@{/js/bootstrap-editable.js}"></script>
+	<script type="text/javascript" th:src="@{/js/bootstrap-table.js}"></script>
+	<script type="text/javascript" th:src="@{/js/bootstrap-table-editable.js}"></script>
+	<script type="text/javascript" th:src="@{/js/showPhoto.js}"></script>
+	<script type="text/javascript" th:src="@{/select2/select2.full.min.js}"></script>
+
+	<style>
+		.option_show{height: 28px;width: 80px;}
+		.option_div{float:left;margin-top: 13px;margin-left:15px;padding-right: 40px;font-size: 16px;}
+		.a-link{color: #0066CC;}
+		#img{width:400px;height:300px;border:black 1px solid;}
+		#image{position: absolute;display: none;z-index:9998;}
+		#photo_dialog{z-index:9999;}
+	</style>
+</head>
+<body class="easyui-layout">
+<div data-options="region:'west',split:true"  style="width:100%;">
+	<div class="cl pd-3 bg-1 bk-gray">
+		<div class="option_div">
+			<input type="radio" class="workAttendanceTime" name="work_attendance_type" value="today"  checked="checked" title="查询今日考勤" >今日考勤
+			<input type="radio" class="workAttendanceTime" name="work_attendance_type" value="other" title="查询过往考勤">过往考勤
+		</div>
+		<div class="option_div">
+			合同名称：<select name="contract" id="contract" class="contract_option option_show" onchange="selectTrainCodesByContract()" style="margin-right: 25px;width: 200px;" value=""></select>
+		</div>
+		<div class="option_div">
+			培训编号：<select name="trainCode" id="trainCode" class="trainCode_option option_show" onchange="selectWorkAttendancesByTrainCode()" style="margin-right: 25px;width: 200px;" value=""></select>
+		</div>
+	</div>
+	<div id="todayiframe">
+		<table id="work_attendance_table" class="display" cellspacing="0" align=center width="100%" style="table-layout:fixed">
+			<thead>
+				<tr>
+					<th style="width:100px;">身份证号</th>
+					<th style="width:100px;">平安卡号</th>
+					<th style="width:50px;">姓名</th>
+					<th style="width:30px;">工种</th>
+					<th style="width:50px;">身份证</th>
+					<th style="width:80px;">手持身份证</th>
+					<th style="width:100px;">上班时间</th>
+					<th style="width:100px;">下班时间</th>
+					<th style="width:100px;">工作位置</th>
+					<th style="width:50px;">完成工作量</th>
+					<th style="width:60px;">操作</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<div id="otherifranme">
+		<div class="cl pd-3 bg-1 bk-gray">
+			<div class="option_div">
+				<input type="radio" class="inOrOut" name="work_attendance" value="in"  checked="checked" title="入场人员" >入场人员
+				<input type="radio" class="inOrOut" name="work_attendance" value="out" title="离场人员">离场人员
+			</div>
+		</div>
+		<table id="labor_in_out_table" class="display" cellspacing="0" align=center width="100%" style="table-layout:fixed;" >
+			<thead>
+				<tr>
+					<th style="width:100px;">身份证号</th>
+					<th style="width:100px;">平安卡号</th>
+					<th style="width:50px;">姓名</th>
+					<th style="width:30px;">工种</th>
+					<th style="width:50px;">身份证</th>
+					<th style="width:80px;">手持身份证</th>
+					<th style="width:60px;">操作</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<div id="image">
+		<img src="" alt="" id="img">
+	</div>
+	<div id="photo_dialog" class="easyui-dialog" title="拍照" style="width:700px;height:600px;" data-options="iconCls:'icon-save',resizable:true, modal: true, closed:true">
+
+		<input type="text" class="input-text" id="in_id_photo" style="display: none;" value=""><!--这里放inId-->
+		<input type="text" class="input-text" id="string_photo" style="display: none;" value=""><!--这里放属性名称-->
+
+		<video id="video" width="640" height="480" autoplay></video><!--<button id="snap" >拍照</button>-->
+		<button id="save" style="height:30px;width:60px;font-size:10px;margin-left: 500px;">保存</button>
+		<canvas id="canvas" width="640" height="480" style="float:right;border:1px solid #000;display: none;"></canvas>
+	</div>
+</div>
+<script th:inline="javascript">
+    var basePath = "/";	//基本路径
+
+    $(document).ready(function() {
+        // disable the error message box
+        $.fn.dataTable.ext.errMode = 'none';
+        //获取合同下拉框内容
+        jQuery.ajax({
+            type:"post",
+            url: basePath + "labor/getcontract",
+            dataType:"json",
+            async : false,//非异步，不跳过
+            success:function(data){
+                var contractHtml = '';
+                for(var i=0;i<data.contract.length;i++){
+                    contractHtml += '<option class="contract" value="'+ data.contract[i].downContractCode +'">' + data.contract[i].contractName + '</option>';
+                }
+                $('#contract').append(contractHtml);
+            }
+        });
+        //获取培训下拉框内容
+        getTrains();
+
+        $('#work_attendance_table').DataTable({
+            "searching" : false,//去掉搜索框方法一
+            "bLengthChange" : false,//去掉每页显示多少条数据方法
+            "paging" : false,//禁止分页
+            "scrollX": true,//横向滚动条
+            "autoWidth":true,//为加横向滚动条附加的条件
+            serverSide : false,//对齐
+            language:{ "sEmptyTable": "数据为空" },
+            ajax : basePath + "workAttendance/getTodayWorkAttendance?downContractCode=" + ($("#contract").val() == null ? '' : $("#contract").val()) +"&trainCode="+($("#trainCode").val() == null ? '' : $("#trainCode").val()),
+            columns : [
+                {data : "idNumber","sDefaultContent" : ""},
+                {data : "inId","sDefaultContent" : ""},
+                {data : "name", "sDefaultContent" : ""},
+                {data : "workerType", "sDefaultContent" : ""},
+                {data : "idPhoto", "sDefaultContent" : "",
+                    "render": function (data, type, full, meta) {
+                        if(data){
+                            return '<a href="#" onmouseover="displayImg(\''+data+'\')" onmouseout="vanishImg()" onmousemove="displayImg(\''+data+'\')" >图片</a>';
+                        }else{
+                            return '';
+                        }
+                    }
+				},
+                {data : "inIdPhoto", "sDefaultContent" : "",
+                    "render": function (data, type, full, meta) {
+                        if(data){
+                            return '<a href="#" onmouseover="displayImg(\''+data+'\')" onmouseout="vanishImg()" onmousemove="displayImg(\''+data+'\')" >图片</a>';
+                        }else{
+                            return '';
+                        }
+                    }
+				},
+                {data : "dayInTime", "sDefaultContent" : ""},
+                {data : "dayOutTime", "sDefaultContent" : ""},
+                {data : "workedSpot", "sDefaultContent" : ""},
+                {data : "workedLoad", "sDefaultContent" : ""},
+                {
+                    "sClass": "center",
+                    "data": null,
+                    "orderable": false,
+                    "render": function (data, type, full, meta) {
+                        return '<a style="text-decoration:none;" class="ml-5" onClick="select_others(this)" href="javascript:;" title="查看所有"><i class="Hui-iconfont">&#xe667;</i></a>';
+                    }
+                }
+            ]
+        });
+        $('#labor_in_out_table').DataTable({
+            "searching" : false,//去掉搜索框方法一
+            "bLengthChange" : false,//去掉每页显示多少条数据方法
+            "paging" : false,//禁止分页
+            "scrollX": true,
+            "autoWidth":true,
+            serverSide : false,//对齐
+            language:{ "sEmptyTable": "数据为空" },
+            ajax : basePath + "laborInOut/getLaborInOutForWorkAttendance?downContractCode=" + ($("#contract").val() == null ? '' : $("#contract").val())
+                +"&trainCode="+($("#trainCode").val() == null ? '' : $("#trainCode").val())+"&inOrOut="+($("input[name='work_attendance']:checked").val()),
+            columns : [
+                {data : "idNumber","sDefaultContent" : ""},
+                {data : "inId","sDefaultContent" : ""},
+                {data : "name", "sDefaultContent" : ""},
+                {data : "workerType", "sDefaultContent" : ""},
+                {data : "idPhoto", "sDefaultContent" : "",
+                    "render": function (data, type, full, meta) {
+                        if(data){
+                            return '<a href="#" onmouseover="displayImg(\''+data+'\')" onmouseout="vanishImg()" onmousemove="displayImg(\''+data+'\')" >图片</a>';
+                        }else{return '';}
+                    }
+				},
+                {data : "inIdPhoto", "sDefaultContent" : "",
+                    "render": function (data, type, full, meta) {
+                        if(data){
+                            return '<a href="#" onmouseover="displayImg(\''+data+'\')" onmouseout="vanishImg()" onmousemove="displayImg(\''+data+'\')" >图片</a>';
+                        }else{return '';}
+                    }
+				},
+                {
+                    "sClass": "center",
+                    "data": null,
+                    "orderable": false,
+                    "render": function (data, type, full, meta) {
+                        return '<a style="text-decoration:none;" class="ml-5" onClick="select_others(this)" href="javascript:;" title="查看该人员的考勤"><i class="Hui-iconfont">&#xe667;</i></a>';
+                    }
+                }
+            ]
+        });
+
+        $("#todayiframe").show();
+        $("#otherifranme").hide();
+
+    });
+    $(".workAttendanceTime").change(function () {
+        if("today"==$("input[name='work_attendance_type']:checked").val()){
+            $("#todayiframe").show();
+            $("#otherifranme").hide();
+            $('#work_attendance_table').DataTable().ajax.url(
+                basePath + 'workAttendance/getTodayWorkAttendance?downContractCode=' + ($("#contract").val() == null ? '' : $("#contract").val())
+                +"&trainCode=" + ($("#trainCode").val() == null ? '' : $("#trainCode").val())).load();
+        }else{
+            $("#todayiframe").hide();
+            $("#otherifranme").show();
+            $('#labor_in_out_table').DataTable().ajax.url(
+                basePath + "laborInOut/getLaborInOutForWorkAttendance?downContractCode=" + ($("#contract").val() == null ? '' : $("#contract").val())
+                +"&trainCode=" + ($("#trainCode").val() == null ? '' : $("#trainCode").val())
+                +"&inOrOut="+($("input[name='work_attendance']:checked").val())).load();
+        }
+    });
+    $(".inOrOut").change(function () {
+        $('#labor_in_out_table').DataTable().ajax.url(
+            basePath + "laborInOut/getLaborInOutForWorkAttendance?downContractCode=" + ($("#contract").val() == null ? '' : $("#contract").val())
+            +"&trainCode=" + ($("#trainCode").val() == null ? '' : $("#trainCode").val())
+            +"&inOrOut="+($("input[name='work_attendance']:checked").val())).load();
+	});
+    //获取培训下拉框内容
+    function getTrains() {
+        jQuery.ajax({
+            type:"post",
+            url: basePath + "train/getTrainsByContract",
+            data:{"downContractCode":$("#contract").val()},
+            dataType:"json",
+            async : false,//非异步，不跳过
+            success:function(data){
+                var contractHtml = '<option class="contract" value="">ALL</option>';
+                for(var i=0;i<data.length;i++){
+                    contractHtml += '<option class="contract" value="'+ data[i].trainCode +'">' + data[i].trainCode + '</option>';
+                }
+                $('#trainCode').append(contractHtml);
+            }
+        });
+    }
+    //改变合同下拉框时，查询该合同下的培训和劳务人员 考勤
+    function selectTrainCodesByContract() {
+        $("#trainCode").html("");//清空一下select标签内容
+        getTrains();
+        selectWorkAttendancesByTrainCode();
+    }
+    //改变 合同 或者 培训编号，查询该培训下的考勤
+    function selectWorkAttendancesByTrainCode() {
+        if("today"==$("input[name='work_attendance_type']:checked").val()){
+            $('#work_attendance_table').DataTable().ajax.url(
+                basePath + "workAttendance/getTodayWorkAttendance?downContractCode=" + ($("#contract").val() == null ? '' : $("#contract").val())
+                +"&trainCode=" + ($("#trainCode").val() == null ? '' : $("#trainCode").val())
+			).load();
+        }else{
+            $('#labor_in_out_table').DataTable().ajax.url(
+                basePath + "laborInOut/getLaborInOutForWorkAttendance?downContractCode=" + ($("#contract").val() == null ? '' : $("#contract").val())
+                +"&trainCode=" + ($("#trainCode").val() == null ? '' : $("#trainCode").val())
+				+"&inOrOut="+($("input[name='work_attendance']:checked").val())
+			).load();
+		}
+    }
+
+    //查询该人员此次培训下的所有考勤
+    function select_others(obj) {
+        var tr = $(obj).parents("tr");
+        var row;
+        if("today"==$("input[name='work_attendance_type']:checked").val()){
+            row = $("#work_attendance_table").DataTable().row($(obj).parents("tr"));
+        }else{
+            row = $("#labor_in_out_table").DataTable().row($(obj).parents("tr"));
+		}
+        if ( row.child.isShown() ) {// This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        } else {// Open this row
+            $('.workAttendanceTable').remove();
+            row.child( format() ).show();
+            tr.addClass('shown');
+            setWorkAttendanceTable(row.data().inId);
+        }
+        $(".workAttendanceTable").DataTable({
+            "searching":false,
+            "paging": false,
+            language:{ "sEmptyTable": "数据为空" }
+        });
+    }
+    function format () {
+        return '<table class="workAttendanceTable" cellspacing="0" align=center width="100%" style="table-layout:fixed;border:5px solid gray;"><thead><tr>' +
+            	'<th>姓名</th><th>上班时间</th><th>下班时间</th><th>工作位置</th><th>完成工作量</th>' +
+            	'</tr></thead></table>';
+        /*'<th>身份证号</th><th>平安卡号</th><th>工种</th><th>身份证照片</th><th>入场手持身份证照片</th>'+*/
+    }
+    function setWorkAttendanceTable(inId) {
+        var table = $('.workAttendanceTable').DataTable({
+            ajax : basePath + "workAttendance/selectWorkAttendanceByInId?inId=" + inId,
+            dataType:"json",
+            async : false,//非异步，不跳过
+            "searching" : false,//去掉搜索框方法一
+            "bLengthChange" : false,//去掉每页显示多少条数据方法
+            "paging" : false,//禁止分页
+            "info": false,//取消底部显示总条数
+            "scrollX": true,
+            "autoWidth":true,
+            language:{ "sEmptyTable": "数据为空" },
+            columns : [
+                {data : "name", "sDefaultContent" : ""},
+                {data : "dayInTime", "sDefaultContent" : ""},
+                {data : "dayOutTime", "sDefaultContent" : ""},
+                {data : "workedSpot", "sDefaultContent" : ""},
+                {data : "workedLoad", "sDefaultContent" : ""}
+			]
+        });
+    }
+
+</script>
+</body>

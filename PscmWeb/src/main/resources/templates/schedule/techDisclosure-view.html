@@ -1,0 +1,263 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link th:href="@{/css/jquery.dataTables.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/semantic.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/dataTables.semanticui.min.css}"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/lib/lightbox2/2.8.1/css/lightbox.css}" rel="stylesheet" type="text/css" >
+
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/webuploader/0.1.5/webuploader.css}" />
+
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery.formHelp.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/semantic.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+<script type="text/javascript" th:src="@{/lib/webuploader/0.1.5/webuploader.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/wangEditor.min.js}"></script>
+<title>技术交底查看</title>
+</head>
+<body>
+<article class="page-container">
+	<form class="form form-horizontal" id="form-ht-add">
+	<input type="hidden" id ="flag" name="flag" th:value="${flag}">
+	<input type="hidden" id ="disAttach" name="disAttach" th:value="${r!=null}?${r.disAttach}">
+	<input type="hidden" th:value="${r!=null}?${r.disclosureCode}" placeholder="" id="disclosureCode" name="disclosureCode">
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>划分名称：</label>
+			<!-- 隐藏的divisionSnCode -->
+			<input type="hidden" th:value="${r!=null}? ${r.divisionSnCode.divisionSnCode}:${disdivsncode}" placeholder="" id="divisionSnCode" name="divisionSnCode.divisionSnCode" readonly="readonly" class="input-text">
+
+		<div class="formControls col-xs-3 col-sm-3">
+			<input type="text" value="" placeholder="" id="divname" name="divname" readonly="readonly" class="input-text">
+		</div>
+		<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>交底时间：</label>
+		<div class="formControls col-xs-3 col-sm-3">
+			<input type="text"  th:value="${r!=null}?${#dates.format(r.disDate, 'yyyy-MM-dd')}" readonly="readonly" id="disDate" name="disDate" class="input-text Wdate">
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>交底包括项：</label>
+		<div class="formControls col-xs-3 col-sm-3">
+			<textarea class="input-text" id="disInclude" name="disInclude" readonly="readonly" th:text="${r!=null&&r.disInclude!=null}?${r.disInclude}"></textarea>
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2"><span class="c-red">*</span>交底内容：</label> <input type="hidden" id="disContent" name="disContent">
+		<div class="formControls col-xs-3 col-sm-3" id="editor" style="width: 75%;"></div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-3 col-sm-2">已上传文件：</label>
+		<div class="formControls col-xs-3 col-sm-9">
+			<table id="fileList" class="ui celled table" cellspacing="0"
+				width="100%" align=center>
+				<thead>
+					<tr>
+						<th>名称</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+	<div class="row cl">
+		<div class="col-xs-3 col-sm-2 col-xs-offset-3 col-sm-offset-2">
+			<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;接受交底&nbsp;&nbsp;" id="saveBut">
+		</div>
+	</div>
+	</form>
+</article>
+
+<script th:inline="javascript">
+var basePath = /*[[@{/}]]*/; 
+var E = window.wangEditor;
+var editor = new E("#editor");
+editor.create();
+editor.$textElem.attr('contenteditable', false);//禁用编辑器功能
+editor.txt.html([[${r!=null&&r.disContent!=null} ? ${r.disContent}]]);
+
+function IsPicture(pic)
+{
+    //判断是否是图片 - strFilter必须是小写列举
+    var strFilter=".jpeg|.gif|.jpg|.png|.bmp|.pic|"
+    if(pic.indexOf(".")>-1)
+    {
+        var p = pic.lastIndexOf(".");
+        //alert(p);
+        //alert(this.length);
+        var strPostfix=pic.substring(p,pic.length) + '|';        
+        strPostfix = strPostfix.toLowerCase();
+        //alert(strPostfix);
+        if(strFilter.indexOf(strPostfix)>-1)
+        {
+            //alert("True");
+            return true;
+        }
+    }        
+    //alert('False');
+    return false;            
+}
+
+function getDivName(divisionsncode){
+	jQuery.ajax({
+		type:"post",
+		url:basePath + "techDisclosure/getDivNameByDivisionsncode",
+		data:{divisionsncode:divisionsncode},
+		success:function(data){
+			if(data==""){
+				$("#divname").val(data);
+			}else{
+				$("#divname").val(data);
+			}
+		}
+	});
+}
+
+var fileTable;
+$(document).ready(function() {
+	
+	var divisionsncode=$("#divisionSnCode").val();
+	if(divisionsncode==null){
+		$("#divname").val(data);
+	}else{
+		getDivName(divisionsncode);
+	}
+	
+	if ([[${retMsg}]] != '') {
+		layer.msg([[${retMsg}]],{icon:1,time:3000});
+	}
+	$("#form-ht-add").validate({
+		rules:{
+			divisionSnCode:{
+				required:true
+			}
+		},
+		onkeyup:false,
+		focusCleanup:true,
+		success:"valid",
+		submitHandler:function(form){
+			$(form).ajaxSubmit({
+				cache: true,
+                type: "POST",
+				url: basePath + "techDisclosure/acceptTechDisclosure",
+				data: $("#form-ht-add").serialize(),
+				async: false,
+				//contentType : "application/x-www-form-urlencoded",
+				success: function(data){
+					if (data.result == true) {
+						layer.msg('接受交底成功!',{icon:1,time:1000}, function(){
+						});
+					} else {
+						layer.msg(data.retMsg,{icon:1,time:3000})
+					}
+				},
+                error: function(XmlHttpRequest, textStatus, errorThrown){
+					layer.msg('接受交底失败!',{icon:1,time:1000});
+				}
+			});
+		}
+	});
+	refreshFileList();
+});
+
+	function refreshFileList() {
+		if ($('#fileList').hasClass('dataTable')){
+			//userTable.fnClearTable(false);//清空数据.fnClearTable();//清空数据  
+			fileTable.destroy(); //还原初始化了的datatable  
+		}
+		fileTable = $('#fileList').DataTable({
+			ajax : basePath + "contractAtt/getContractAttList",
+			fnServerParams : function (aoData) {
+				aoData.push(
+					{ name : "fileInNames", value : $("#disAttach").val() }
+				);
+			},
+			columns : [{
+				data : null,
+				"render": function (data, type, full, meta) {
+					if (IsPicture(data.type)) {
+						return  '<a href="' + /*[[@{/}]]*/
+								+ data.location + '" data-lightbox="gallery" data-title="' + data.actualFileName + '">'
+								+ data.actualFileName
+								+ '</a>';
+					} else {
+						return '<a style="text-decoration:none" class="ml-5" onClick="downloadFile(\''
+								+ data.location
+								+ '\',\''
+								+ data.actualFileName
+								+ '\')" href="javascript:;" title="下载">'
+								+ data.actualFileName
+								+ '</a>';
+					}
+                }
+            }]
+		});
+	}
+	function downloadFile(fileRealPath, fileName) {
+		window.open(basePath + "contractAtt/fileDownload?fileRealPath=" + fileRealPath
+				+ "&fileName=" + encodeURI(encodeURI(fileName)));
+	};
+	
+	function setData(d) {
+		jQuery.ajax({
+			type : 'POST',
+			url : basePath + 'techDisclosure/acceptTechDisclosureByDisDivSnCode?divSnCode=' + d,
+			dataType: 'json',
+			success: function(data){
+				if(data.retMsg == "" || data.retMsg == "已接受交底"){
+					$("#form-ht-add").setForm(data.r);
+					$("#disdate").val(data.r.disdate.substr(0,10));
+					editor.txt.html(data.r.disContent);
+					getDivName(d);
+					refreshFileList();
+					if (data.retMsg == "已接受交底") {
+						layer.msg(data.retMsg,{icon:1,time:3000})
+						//$("#saveBut").attr("disabled","disabled");//
+					} else {
+						//$("#saveBut").removeAttr("disabled");//
+					}
+				} else {
+					$("#form-ht-add").resetForm();
+					$("input[type!='submit']").val("");
+					editor.txt.html("");
+					if ($('#fileList').hasClass('dataTable')){
+						//userTable.fnClearTable(false);//清空数据.fnClearTable();//清空数据  
+						//fileTable.destroy(); //还原初始化了的datatable
+						fileTable.clear().draw()
+					}
+					layer.msg(data.retMsg,{icon:1,time:3000});
+				}
+			},
+			error:function(data) {
+				$("#form-ht-add").resetForm();
+				$("input[type!='submit']").val("");
+				if ($('#fileList').hasClass('dataTable')){
+					fileTable.clear().draw();//清空数据.fnClearTable();//清空数据  
+					//fileTable.destroy(); //还原初始化了的datatable  
+				}
+				layer.msg(data.retMsg,{icon:1,time:3000});
+			}
+		});	
+	}
+</script> 
+<!--/请在上方写此页面业务相关的脚本-->
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/lightbox2/2.8.1/js/lightbox.js}"></script>
+</body>
+</html>

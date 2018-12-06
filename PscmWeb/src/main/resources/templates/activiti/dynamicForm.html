@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link th:href="@{/css/jquery.dataTables.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/select.dataTables.min.css}"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/css/semantic.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/dataTables.semanticui.min.css}"
+	rel="stylesheet" type="text/css" />
+
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/semantic.min.js}"></script>
+	
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+<style>
+.page-container{
+ padding: 1px 5px 5px 5px;
+}
+</style>
+<script th:inline="javascript">
+/*<![CDATA[*/  
+var basePath = /*[[@{/}]]*/;  
+var rules = new Object();		
+/*]]>*/
+</script>
+</head>
+<body >
+<article class="page-container">
+	<form class="form form-horizontal" id="form-ht-add">
+	<div class="row cl" th:each="prop : ${list}">
+		<label class="form-label col-xs-4 col-sm-2"><span class="c-red" th:if="${prop.required}">*</span>[[${prop.name}]]</label>
+		<div class="formControls col-xs-8 col-sm-9 skin-minimal" th:if="${prop.type.name=='boolean'}">
+			<script th:inline="javascript"  th:if="${prop.required}">
+				var o = { required:true};
+				rules['p_B_'+ [[${prop.id}]]] = o;	
+			</script>
+			<div class="radio-box">
+				<input th:name="p_B_+${prop.id}" type="radio" id="sex-1" value="true" th:readonly="${!prop.writable}" th:checked="${prop.value!=null} ? ${prop.value} : true">
+				<label for="radio-1">是</label>
+			</div>
+			<div class="radio-box">
+				<input th:name="p_B_+${prop.id}" type="radio" id="sex-2" value="false" th:readonly="${!prop.writable}" th:checked="${prop.value!=null} ? ${prop.value} : false">
+				<label for="radio-2">否</label>
+			</div>
+		</div>
+		<div class="formControls col-xs-4 col-sm-2" th:if="${prop.type.name=='date'}">
+			<script th:inline="javascript" th:if="${prop.required}">
+				var o = { required:true};
+				rules['p_DT_'+ [[${prop.id}]]] = o;	
+			</script>
+			<input type="text"  th:value="${prop.value!=null}?${prop.value}" th:readonly="${!prop.writable}"
+				th:attr="onfocus=${prop.writable}?'WdatePicker({ dateFmt:\'' + ${__${'pattern_'+prop.id}__} + '\'})'" 
+				th:id="p_DT_+${prop.id}" th:name="p_DT_+${prop.id}" class="input-text Wdate">
+		</div>
+		<div class="formControls col-xs-4 col-sm-2" th:if="${prop.type.name=='long'}">
+			<script th:inline="javascript" th:if="${prop.required}">
+				var o = { required:true};
+				rules['p_L_'+ [[${prop.id}]]] = o;	
+			</script>
+			<input type="number" class="input-text" th:value="${prop.value!=null} ? ${prop.value}" th:readonly="${!prop.writable}" placeholder="" th:id="p_L_+${prop.id}" th:name="p_L_+${prop.id}">
+		</div>
+		<div class="formControls col-xs-4 col-sm-2" th:if="${prop.type.name=='string'}">
+			<script th:inline="javascript" th:if="${prop.required}">
+				var o = { required:true};
+				rules['p_S_'+ [[${prop.id}]]] = o;	
+			</script>
+			<input type="text" class="input-text" th:value="${prop.value!=null} ? ${prop.value}" th:readonly="${!prop.writable}" placeholder="" th:id="p_S_+${prop.id}" th:name="p_S_+${prop.id}">
+		</div>
+		<div class="formControls col-xs-4 col-sm-2" th:if="${prop.type.name=='enum'}">
+			<span class="select-box" style="width:150px;">
+				<select th:id="p_S_+${prop.id}" class="select" th:name="p_S_+${prop.id}" size="1" th:disabled="${!prop.writable}" >
+					<option th:value="${selectValue.value}" th:selected="${prop.value!=null}?${prop.value == selectValue.key}" th:each="selectValue:${__${'enum_'+prop.id}__}" th:text="${selectValue.value}"></option>
+				</select>
+			</span> 
+		</div>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-4 col-sm-2">审批意见：</label>
+		<div class="formControls col-xs-8 col-sm-9">
+			<textarea class="input-text" id="p_S_claim" name="p_S_claim" style="height:50px;"></textarea>
+		</div>
+	</div>
+	<div class="row cl">
+		<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+			<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;审批&nbsp;&nbsp;">
+		</div>
+	</div>
+	</form>
+</article>
+
+<script th:inline="javascript">
+$(document).ready(function() {
+	$("#form-ht-add").validate({
+		rules : rules,
+		onkeyup:false,
+		focusCleanup:true,
+		success:"valid",
+		submitHandler:function(form){
+			$(form).ajaxSubmit({
+				cache: true,
+                type: "POST",
+				url: basePath + "activiti/task/complete/" + [[${taskId}]],
+				async: false,
+				//contentType : "application/x-www-form-urlencoded",
+				success: function(data){
+					if (data.result == true) {
+						layer.msg('审批成功!',{icon:1,time:1000}, function(){
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.$('.btn-refresh').click();
+							parent.layer.close(index);
+						});
+					} else {
+						layer.msg(data.retMsg,{icon:1,time:1000})
+					}
+				},
+                error: function(XmlHttpRequest, textStatus, errorThrown){
+					layer.msg('审批失败!',{icon:1,time:1000});
+				}
+			});
+		}
+	});
+});
+</script> 
+<!--/请在上方写此页面业务相关的脚本-->
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script> 
+</body>
+</html>

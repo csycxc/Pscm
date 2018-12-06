@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/semantic.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/dataTables.semanticui.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/editor.dataTables.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/buttons.dataTables.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/select.dataTables.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/themes/default/easyui.css}"/>
+
+<link rel="stylesheet" type="text/css" th:href="@{/editor-app/libs/bootstrap_3.1.1/css/bootstrap.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-editable.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/select2/select2-bootstrap.css}" />
+
+<script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>	
+<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/dataTables.select.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+
+<script type="text/javascript" th:src="@{/js/bootstrap-editable.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-table.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap-table-editable.js}"></script>
+<style>
+.option_show{height: 28px;width: 80px;}
+.option_div{float:left;margin-top: 13px;margin-left:15px;padding-right: 40px;font-size: 16px;}
+.a-link{color: #0066CC;}
+</style>
+</head>
+<body class="easyui-layout">
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    var basePath = /*[[@{/}]]*/;
+    /*]]>*/
+</script>
+	<div data-options="region:'west',split:true"  style="width:70%;">
+		<div class="cl pd-3 bg-1 bk-gray">
+			<div class="option_div">
+				交易活动类型：<select name="bizTypeOptions" id="bizTypeOptions" class="bizType_option option_show" style="margin-right: 25px;"></select>
+				状态：<select name="statusOptions" id="statusOptions" class="status_option option_show"></select>
+			</div>
+			<span class="l" style="margin-top: 10px;margin-bottom: 15px;padding-right: 30px;">
+				<a href="javascript:;" onclick="tenderPlan_select()" class="btn btn-primary radius">确定</a>
+			</span>
+			<span class="l" style="margin-top: 10px;margin-bottom: 15px;">
+				<a href="javascript:;" onclick="evaluationReport_add()" class="btn btn-primary radius">增加</a>
+			</span>
+				<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="btn-refresh Hui-iconfont">&#xe68f;</i></a>
+		</div>
+
+		<table id="evaluationReport" class="display" cellspacing="0" width="100%" align="center" style="table-layout:fixed">
+			<thead>
+				<tr>
+					<th style="width:20%;">工作项名称</th>
+					<th style="width:10%;">交易活动类型</th>
+					<th style="width:10%;">开标时间</th>
+					<th style="width:10%;">工程预估价</th>
+					<th style="width:10%;">公司指导价</th>
+					<th style="width:15%;">开标地点</th>
+					<th style="width:10%;">状态</th>
+					<th style="width:15%;">操作</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	
+	<!-- 右侧页面 -->
+	<div data-options="region:'center'" >
+		<div id="reload-add" th:replace="evaluationReport/evaluationReport-edit::topbar"></div>
+	</div>
+
+
+	<script th:inline="JavaScript">
+	var reportList;
+	var approvalList;
+	var evaluationReportList;
+	var editor;
+	
+	$(document).ready(function() {
+		//加载查询条件下拉框
+		jQuery.ajax({
+            type: "post",
+            url: basePath+"report/getBizTypeStatusList",
+            dataType: "json",
+            success: function(data){
+              var bizTypeHtml = '<option value="">请选择</option>';
+              //var tenderWayHtml = '<option value="">请选择</option>';
+              var statusHtml = '<option value="">请选择</option>';
+              for(var i=0;i<data.BizType.length;i++){
+           		  bizTypeHtml +='<option value="'+data.BizType[i].enumValue+'">'+data.BizType[i].enumValueName+'</option>';
+              }
+              /* for(var i=0;i<data.TenderWay.length;i++){
+           		  tenderWayHtml +='<option value="'+data.TenderWay[i].enumValue+'">'+data.TenderWay[i].enumValueName+'</option>';
+              } */
+              for(var i=0;i<data.Status.length;i++){
+           		  statusHtml +='<option value="'+data.Status[i].enumValue+'">'+data.Status[i].enumValueName+'</option>';
+              }
+              $('.bizType_option').append(bizTypeHtml);
+              //$('.tenderWay_option').append(tenderWayHtml);
+              $('.status_option').append(statusHtml);
+           }
+        });
+		//工作项
+		jQuery.ajax({
+            type: "post",
+            url: basePath+"tenderPlan/findApprovalFinishTenderPlan",
+            dataType: "json",
+            success: function(data){
+              var workItemNameHtml = '';
+              for(var i=0;i<data.length;i++){
+            	  workItemNameHtml +='<option value="'+data[i].tenderPlanCode+'">'+data[i].workItemName+'</option>';
+              }
+              $('#tenderPlanCodeSelect').append(workItemNameHtml);
+           }
+        });
+
+		$("#bidResultInfo").validate({
+			rules:{
+				tenderPlanCode:{
+					required:true,
+					maxlength:100
+				},
+				tenderOpenDate:{
+					required:true
+				},
+				tenderOpenPlace:{
+					required:true,
+					maxlength:50
+				},
+				futurePrice:{
+					required:true,
+					isIntGteZero:true
+				},
+				guidePrice:{
+					required:true,
+					isIntGteZero:true
+				}
+			},
+			onkeyup:false,
+			focusCleanup:true,
+			success:"valid",
+			submitHandler:function(form){
+				if ($("#flag").val() == "I") {
+					$("#tenderPlanCode").val($("#tenderPlanCodeSelect option:selected").val());
+				}
+				var reportData = $("#report").bootstrapTable('getData');
+				document.getElementById('reportJson').value = JSON.stringify(reportData).toString();
+				$(form).ajaxSubmit({
+					//cache: true,
+	                type: "post",
+	                dataType : "json", 
+					url: basePath+"report/addOrUpdateReport",
+					data: $("#bidResultInfo").serialize(),
+					success: function(data){
+						if (data.result == true) {
+							layer.msg(data.retMsg,{icon:1,time:2000}, function(){
+								$('.btn-refresh').click();
+							});
+						} else {
+							layer.msg(data.retMsg,{icon:1,time:2000})
+						}
+					},
+	                error: function(XmlHttpRequest, textStatus, errorThrown){
+						layer.msg('保存失败',{icon:1,time:2000});
+					}
+				});
+			}
+		});
+		
+		evaluationReportList = $('#evaluationReport').DataTable({
+				ajax : basePath+"report/getAllReport",
+				columns : [{
+					data : "tenderPlanCode.workItemName",
+					"sDefaultContent" : ""
+				}, {
+					data : "tenderPlanCode.bizType.enumValueName",
+					"sDefaultContent" : ""
+				}, {
+					data : "tenderOpenDate",
+					"sDefaultContent" : ""
+				}, {
+					data : "futurePrice",
+					"sDefaultContent" : ""
+				}, {
+					data : "guidePrice",
+					"sDefaultContent" : ""
+				}, {
+					data : "tenderOpenPlace",
+					"sDefaultContent" : ""
+				}, {
+					data : "status.enumValueName",
+					"sDefaultContent" : ""
+				}, {
+	                 "sClass": "center",
+	                 "data": null,
+	                 "orderable": false,  
+	                 "render": function (data, type, full, meta) {
+	                	 if(data.bidResultCode=="" || data.bidResultCode==null){
+	                		 return '<a style="text-decoration:none" class="ml-5"></a>';
+	                	 }else{
+	                		//起草
+	                		 if (data.status.enumValue == 1) {
+			                	 return '<a style="text-decoration:none" class="ml-5 a-link" onClick="result_submit('+data.bidResultCode+')" href="javascript:;" title="提交">提交</a>'
+						                	 +'<a style="text-decoration:none" class="ml-5 a-link" onClick="detail_show_edit('
+						     				+ data.tenderPlanCode.tenderPlanCode+',\''+data.bidResultCode+'\',\''+data.tenderPlanCode.workItemName+'\',\''+data.tenderOpenPlace+'\',\''+data.evaluateGroupComment+'\',\''+data.tenderOpenDate +'\','+data.futurePrice +','+data.guidePrice + ')" href="javascript:;" title="编辑">编辑</a>'
+						                	 + '<a style="text-decoration:none" class="ml-5 a-link" onClick="result_del(this,\''+data.bidResultCode+'\')" href="javascript:;" title="删除">删除</a>'
+						                	 + '<a style="text-decoration:none;" class="ml-5 a-link details-control"  href="javascript:;">清单&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>';
+	                		 } else {
+		                		 return '<a style="text-decoration:none" class="ml-5 a-link" onClick="detail_show('
+				     			 + data.tenderPlanCode.tenderPlanCode+',\''+data.bidResultCode+'\',\''+data.tenderPlanCode.workItemName+'\',\''+data.tenderOpenPlace+'\',\''+data.evaluateGroupComment+'\',\''+data.tenderOpenDate +'\','+data.futurePrice +','+data.guidePrice + ')" href="javascript:;" title="详细">详细</a>'
+				     			 + (data.taskId ? '<a style="text-decoration:none" class="ml-5 a-link" onClick="layerOpen(\'审批\',\'' + basePath + 'activiti/showTaskView/' + data.taskId + '\',\'800\',\'500\')" href="javascript:;" title="审批">审批</a>' : "")
+				     			 + '<a style="text-decoration:none;" class="ml-5 a-link details-control"  href="javascript:;">清单&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>'
+				     			 + '<a style="text-decoration:none" class="ml-5" onClick="layerOpen(\'流程图查看\',\'' + basePath + 'activiti/read-resource?processDefinitionId=tenderResult&resourceName=tenderResult.png&businessKey=' + data.bidResultCode + '\',\'800\',\'500\')" href="javascript:;" title="查看流程"><i class="Hui-iconfont">&#xe695;</i></a>';
+		                	 }
+	                	 }
+                	 }
+	            }],
+				language:{ "sEmptyTable": "数据为空" },
+	            select : {
+					style : 'single'
+				}
+			});
+			evaluationReportList.on( 'select', function ( e, dt, type, indexes ) {
+				var rowData = evaluationReportList.rows(indexes).data().toArray();
+				if(rowData[0].bidResultCode=="" || rowData[0].bidResultCode==undefined){
+					detail_show_edit('','','','','','','','');
+					$("#tenderPlanCodeSelect")[0].style.display="";
+					$("#workItemName")[0].style.display="none";
+				}else{
+					detail_show(rowData[0].tenderPlanCode.tenderPlanCode,rowData[0].bidResultCode,rowData[0].tenderPlanCode.workItemName,rowData[0].tenderOpenPlace,rowData[0].evaluateGroupComment,rowData[0].tenderOpenDate,rowData[0].futurePrice,rowData[0].guidePrice);
+				}
+			});
+			evaluationReportList.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
+		        if ( originalEvent.target.nodeName.toLowerCase() === 'a' ) {
+		            e.preventDefault();
+		        }
+		    });
+			// Add event listener for opening and closing details
+		    $('#evaluationReport tbody').on('click', 'a.details-control', function () {
+		        var tr = $(this).closest('tr');
+		        var row = evaluationReportList.row( tr );
+		        if (row.data().tenderPlanCode ==undefined) {
+		        	return;
+		        }
+		        if ( row.child.isShown() ) {
+		            // This row is already open - close it
+		            row.child.hide();
+		            tr.removeClass('shown');
+		        } else {
+		            // Open this row
+		            var detailStr = '<table id="detail' + row.data().tenderPlanCode.tenderPlanCode + '" cellpadding="5" class="detail" cellspacing="0" border="0" style="padding-left:50px;"></table>';
+				    jQuery.ajax({
+						type : 'POST',
+						url : basePath + 'bidSupplier/findSupplierBidItemRateByTenderPlanCode',
+						data : {tenderPlanCode:row.data().tenderPlanCode.tenderPlanCode},
+						dataType: 'json',
+						success: function(data){
+							row.child(detailStr).show();
+				            tr.addClass('shown');
+				            
+				            var itemList = $("#detail" + row.data().tenderPlanCode.tenderPlanCode).bootstrapTable({
+				    			toolbar: '#toolbar',
+				    	        method:'POST',
+				    	        data: eval('(' +data.data+ ')'),
+				    	        contentType: "text/html;charset=UTF-8",
+				    	        cache: false,
+				    	        striped: true,                       //是否显示行间隔色
+				    	        sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+				    	        showColumns:false,
+				    	        pagination:false,
+				    	        clickToSelect : true,
+				    	        uniqueId: "supplierBidCode",   		//每一行的唯一标识，一般为主键列
+				    	        formatLoadingMessage: function () {
+				            		return "";//"请稍等，正在加载中...";
+				            	},
+				    	        columns: eval('(' +data.column+ ')')
+				    	    });
+						},
+						error:function(data) {
+						}
+					});	
+		        }
+		        return false;
+		    } );
+	});
+			
+		/* 表格的条件查询 */
+		function tenderPlan_select(){
+			var bizTypeOptions = $("#bizTypeOptions").find("option:selected").text();
+			var statusOptions = $("#statusOptions").find("option:selected").text();
+			if(bizTypeOptions=="请选择" && statusOptions!="请选择"){
+				tenderPlanList.search(statusOptions).draw();
+			}else if(bizTypeOptions!="请选择" && statusOptions=="请选择"){
+				tenderPlanList.search(bizTypeOptions).draw();
+			}else if(bizTypeOptions!="请选择" && statusOptions!="请选择"){
+				tenderPlanList.search(bizTypeOptions+" "+statusOptions).draw();
+			}else{
+				$('.btn-refresh').click();
+			}
+		}
+		
+		/* 初始化表格 */
+		reportList = $('#report').DataTable({
+			"searching":false,
+			"info": false,
+			"ordering": false,
+	        "paging": false,
+	        language:{ "sEmptyTable": "数据为空" }
+		});
+		approvalList = $('#approval').DataTable({
+			"searching":false,
+			"info": false,
+			"ordering": false,
+	        "paging": false,
+	        language:{ "sEmptyTable": "数据为空"}
+		});
+		
+		/* 详细 */
+		function detail_show(tenderPlanCode,bidResultCode,workItemName,tenderOpenPlace,evaluateGroupComment,tenderOpenDate,futurePrice,guidePrice){
+			$(':input','#bidResultInfo').not(':button,:submit,:reset,:hidden').val('');
+			if(tenderPlanCode!=null)$("#tenderPlanCode").val(tenderPlanCode);
+			if(bidResultCode!=null)$("#bidResultCode").val(bidResultCode);
+			if(workItemName!=null)$("#workItemName").val(workItemName);
+			if(tenderOpenDate!=null)$("#tenderOpenDate").val(tenderOpenDate);
+			if(tenderOpenPlace!=null)$("#tenderOpenPlace").val(tenderOpenPlace);
+			if(futurePrice!=null)$("#futurePrice").val(futurePrice);
+			if(guidePrice!=null)$("#guidePrice").val(guidePrice);
+			if(evaluateGroupComment!=null)$("#evaluateGroupComment").val(evaluateGroupComment);
+			$("#bidResultInfo").find('input,select,textarea').attr('readonly',true);
+			document.getElementById("btn_save").style.display="none";
+			if (tenderPlanCode != "") {
+				setDataForReport(tenderPlanCode);
+			}
+			if (bidResultCode != "") {
+				setDataForApproval(bidResultCode);
+			}
+			$("#tenderPlanCodeSelect")[0].style.display="none";
+			$("#workItemName")[0].style.display="";
+		}
+		$("#tenderPlanCodeSelect").change(function(){
+		    var opt=$("#tenderPlanCodeSelect").val();
+		    setDataForReport(opt);
+		});
+		/* 招标结果表格的填充 */
+		 function setDataForReport(tenderPlanCode){
+			if ($('#report').hasClass('dataTable')){
+				reportList.destroy(); //还原初始化了的datatable
+			}
+			$('#report').bootstrapTable('destroy');
+			supplierList = $("#report").bootstrapTable({
+				toolbar: '#toolbar',
+		        method:'POST',
+		        url: basePath+"bidSupplier/getSupplierByTenderPlanCode?tenderPlanCode="+tenderPlanCode,
+		        contentType: "text/html;charset=UTF-8",
+		        cache: false,
+		        striped: true,                       //是否显示行间隔色
+		        sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+		        showColumns:false,
+		        pagination:false,
+		        clickToSelect : true,
+		        uniqueId: "supplierBidCode",   		//每一行的唯一标识，一般为主键列
+		        columns: [{
+		            field: 'supplierCreditCode.supplierName',
+		            title: '单位名称'
+		        }, {
+		            field: 'firstQuote',
+		            title: '一次报价'
+		        },  {
+		            field: 'endQuote',
+		            title: '最终报价',
+		            editable : {
+	                	type : 'text',
+	                	validate : function (v) {
+	                        if (!v) {
+	                        	return '最终报价不能为空';
+	                        } else {
+	                        	if (isNaN(v)) {
+	                        		return '请填写数字';
+	                        	}
+	                        }
+	                    }
+	                },
+	                formatter : function (value,row,index) {
+	                	if (value != undefined) {
+	                		return value;
+	                	} else {
+	                		return '';
+	                	}
+	                }
+		        },  {
+		            field: 'orderBy',
+		            title: '排序',
+		            editable : {
+	                	type : 'text',
+	                	validate : function (v) {
+	                		var r = /^\+?[1-9][0-9]*$/;　　//正整数
+	                        if (v) {
+	                        	if (isNaN(v)) {
+	                        		return '请填写数字';
+	                        	} else if(!r.test(v)) {
+	                        		return '请填写正整数';
+	                        	}
+	                        }
+	                    }
+	                },
+	                formatter : function (value,row,index) {
+	                	if (value != undefined) {
+	                		return value;
+	                	} else {
+	                		return '';
+	                	}
+	                }
+		        },  {
+		            field: 'remark',
+		            title: '报价说明',
+		            editable : true,
+	                formatter : function (value,row,index) {
+	                	if (value != undefined) {
+	                		return value;
+	                	} else {
+	                		return '';
+	                	}
+	                }
+		        }]
+		    });
+		}
+		
+	/* 编辑 */
+	function detail_show_edit(tenderPlanCode,bidResultCode,workItemName,tenderOpenPlace,evaluateGroupComment,tenderOpenDate,futurePrice,guidePrice){
+		$(':input','#bidResultInfo').not(':button,:submit,:reset,:hidden').val('');
+		detail_show(tenderPlanCode,bidResultCode,workItemName,tenderOpenPlace,evaluateGroupComment,tenderOpenDate,futurePrice,guidePrice);
+		if(tenderPlanCode==''){
+			$("#flag").val("I");
+		}else{
+			$("#flag").val("U");
+		}
+		$("#bidResultInfo").find('input,select,textarea').attr('readonly',false);
+		$("#workItemName").attr('readonly',true);
+		document.getElementById("btn_save").style.display="block";
+		setDataForReport(tenderPlanCode);
+		
+	}
+	
+	/* 提交 */
+	function result_submit(bidResultCode) {
+		layer.confirm('确认提交吗？',function(index){
+			jQuery.ajax({
+				type: "post",
+                dataType : "json", 
+				url: basePath+"report/startProcessInstance",
+				data : {"bidResultCode" : bidResultCode},
+				success: function(data){
+					if (data.result) {
+						layer.msg('提交成功',{icon:1,time:2000}, function(){
+							$('.btn-refresh').click();
+						});
+					} else {
+						layer.msg(data.retMsg,{icon:1,time:2000});
+					}
+					
+				},
+				error:function(data) {
+					layer.msg('提交失败!',{icon:1,time:2000});
+					console.log(data.msg);
+				},
+			});		
+		});
+	}
+	
+	/* 删除 */
+	function result_del(obj,bidResultCode){
+		layer.confirm('确认要删除吗？',function(index){
+			jQuery.ajax({
+				type: "post",
+                dataType : "json", 
+				url: basePath+"report/deleteReport",
+				data : {"bidResultCode" : bidResultCode},
+				success: function(data){
+					$("#evaluationReport").DataTable().row($(obj).parents("tr")).remove().draw();
+					layer.msg('删除成功!',{icon:1,time:2000});
+				},
+				error:function(data) {
+					layer.msg('删除失败!',{icon:1,time:2000});
+					console.log(data.msg);
+				},
+			});		
+		});
+	}
+	
+	/*审批记录的填充 */
+	function setDataForApproval(bidResultCode){
+		if ($('#approval').hasClass('dataTable')){
+			approvalList.destroy(); //还原初始化了的datatable  
+		}
+		approvalList = $('#approval').DataTable({
+			ajax : basePath+"activiti/getTrackList",
+			fnServerParams : function(aoData) {
+				aoData.push(
+					{name : "businessKey",value : "tenderResult-" + bidResultCode}
+				);
+			},
+			columns : [{
+				data : "name",
+				"sDefaultContent" : ""
+			}, {
+				data : "claim",
+				"sDefaultContent" : ""
+			}, {
+				data : "dealtime",
+				"sDefaultContent" : ""
+			}, {
+				data : "dealername",
+				"sDefaultContent" : ""
+			}],
+			"ordering": false,
+	        "paging": false,
+			"searching":false,
+			"info": false,//去掉底部文字(数据条数)
+	        language:{
+	        	"sEmptyTable": "数据为空"
+	        },
+			select : {
+				style : 'single'
+			}
+		});
+	}
+	/* 增加 */
+	function evaluationReport_add(){
+		var t = $("#evaluationReport").DataTable();
+		t.row.add([
+            '',
+        ]).draw();
+	}
+	
+	/*弹出页面*/
+	function layerOpen(title,url,id,w,h){
+		var index = layer.open({
+			type: 2,
+			title: title,
+			content: url
+		});
+		layer.full(index);
+	}
+	</script>
+<!--/请在上方写此页面业务相关的脚本-->
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script> 
+</body>

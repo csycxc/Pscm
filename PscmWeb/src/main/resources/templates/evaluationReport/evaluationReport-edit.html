@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+<script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+</head>
+<body>
+
+<div th:fragment="topbar">
+	<form id="bidResultInfo" name="bidResultInfo" style="padding-top: 30px;padding-left: 20px;padding-right: 0px;">
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">工作项名称:</label>
+			<div class="formControls col-xs-3 col-sm-8" style="margin-left: -40px;">
+				<input type="hidden" name="reportJson" id="reportJson">
+				<input type="hidden" name="flag" id="flag" value="">
+				<input type="hidden" name="bidResultCode" id="bidResultCode" value="">
+				<input type="text" name="workItemName" id="workItemName" readonly="readonly" style="display: none" class="input-text">
+				<input type="hidden" name="tenderPlanCode.tenderPlanCode" id="tenderPlanCode" value="">
+				<select name="tenderPlanCodeSelect" id="tenderPlanCodeSelect" class="option_show">
+				</select>
+			</div>
+		</div>
+			<!-- label class="form-label col-xs-3">交易活动类型:</label>
+			<select name="bizType" id="bizType" class="bizType_option option_show" style="margin-left: -20px;width: 110px;"></select>
+		</div>
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">招 标 方 式:</label>
+			<select name="tenderWay" id="tenderWay" class="tenderWay_option option_show" style="margin-left: -30px;margin-right: 15px;float: left;width: 110px;"></select>
+			<label class="form-label col-xs-3">拟定供方数量:</label>
+			<div class="formControls col-xs-3 col-sm-3" style="margin-left: -30px;">
+				<input type="text" value="" placeholder="" id="planSupplierNumber" name="planSupplierNumber" class="input-text">
+			</div>
+		</div -->
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">开标时间:</label>
+			<div class="formControls col-xs-3 col-sm-3" style="margin-left: -30px;width: 250px;">
+				<input type="date" value="" placeholder="" id="tenderOpenDate" name="tenderOpenDate" class="input-text">
+			</div>
+		</div>
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">开标地点:</label>
+			<div class="formControls col-xs-3 col-sm-3" style="margin-left: -30px;width: 250px;">
+				<input type="text" value="" placeholder="" id="tenderOpenPlace" name="tenderOpenPlace" class="input-text">
+			</div>
+		</div>
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">工程预估价:</label>
+			<div class="formControls col-xs-3 col-sm-3" style="margin-left: -30px;">
+				<input type="number" value="" placeholder="" id="futurePrice" name="futurePrice" class="input-text">
+			</div>
+			<label class="form-label col-xs-3">公司指导价:</label>
+			<div class="formControls col-xs-3 col-sm-3" style="margin-left: -30px;">
+				<input type="number" value="" placeholder="" id="guidePrice" name="guidePrice" class="input-text">
+			</div>
+		</div>
+		<!-- div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">工作内容:</label>
+			<div class="formControls col-xs-3 col-sm-2" style="width: 496px;">
+				<textarea class="input-text" id="mainContents" name="mainContents" style="height: 80px;"></textarea>
+			</div>
+		</div>
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3" style="width: 200px;">招标范围及工作量:</label>
+			<div class="formControls col-xs-3 col-sm-2" style="width: 496px;">
+				<textarea class="input-text" id="scopeWorkload" name="scopeWorkload" style="height: 80px;"></textarea>
+			</div>
+		</div>
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">标准要求:</label>
+			<div class="formControls col-xs-3 col-sm-2" style="width: 496px;">
+				<textarea class="input-text" id="requirements" name="requirements" style="height: 80px;"></textarea>
+			</div>
+		</div -->
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">评论小组意见:</label>
+			<div class="formControls col-xs-3 col-sm-2" style="width: 496px;">
+				<textarea class="input-text" id="evaluateGroupComment" name="evaluateGroupComment" style="height: 80px;"></textarea>
+			</div>
+		</div>
+		<div class="row cl" style="padding-bottom: 30px;width:530px;">
+			<label class="form-label col-xs-3" style="padding-top: 20px;">招标结果:</label>
+			<table id="report" class="display" cellspacing="0" align="center" style="table-layout:fixed">
+				<thead>
+					<tr>
+						<th style="width:35%;">单位名称</th>
+						<th style="width:15%;">一次报价</th>
+						<th style="width:15%;">最终报价</th>
+						<th style="width:10%;">排序</th>
+						<th style="width:25%;">报价说明</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-3">审批记录:</label>
+			<table id="approval"  class="ui celled table" cellspacing="0"
+				width="100%" align=center  style="table-layout:fixed">
+				<thead>
+					<tr>
+						<th style="width:22%;text-align:center;">处理名称</th>
+						<th style="width:50%;text-align:center;">处理要求</th>
+						<th style="width:18%;text-align:center;">处理时间</th>
+						<th style="width:10%;text-align:center;">处理人</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<div class="row cl" id="btn_save" style="display: none;">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3" style="margin-left: 20px;">
+				<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;保存&nbsp;&nbsp;">
+			</div>
+		</div>
+	</form>
+</div>
+<script type="text/javascript">
+supplierList = $('#supplier').DataTable({
+	"searching":false,
+	"info": false,
+	"ordering": false,
+    "paging": false,
+    language:{ "sEmptyTable": "数据为空" }
+});
+approvalList = $('#approval').DataTable({
+	"searching":false,
+	"info": false,
+	"ordering": false,
+    "paging": false,
+    language:{ "sEmptyTable": "数据为空"}
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>合同审签</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery.dataTables.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/semantic.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dataTables.semanticui.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/buttons.dataTables.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/select.dataTables.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/themes/default/easyui.css}"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/editor-app/libs/bootstrap_3.1.1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-editable.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/select2/select2-bootstrap.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/select2/select2.min.css}"/>
+
+    <script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.mockjax.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery/dataTables.select.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery/dataTables.buttons.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+    <script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+
+    <script type="text/javascript" th:src="@{/js/bootstrap-editable.js}"></script>
+    <script type="text/javascript" th:src="@{/js/bootstrap-table.js}"></script>
+    <script type="text/javascript" th:src="@{/js/bootstrap-table-editable.js}"></script>
+    <script type="text/javascript" th:src="@{/select2/select2.full.min.js}"></script>
+    <style>
+        .option_div {
+            float: left;
+            margin-top: 13px;
+            margin-left: 15px;
+            padding-right: 40px;
+            font-size: 16px;
+        }
+
+        .option_show {
+            height: 28px;
+            width: 80px;
+        }
+
+        .a-link {
+            color: #0066CC;
+        }
+
+    </style>
+</head>
+<body class="easyui-layout">
+<div data-options="region:'west',split:true" style="width:70%;">
+    <div class="cl pd-3 bg-1 bk-gray">
+        <div class="option_div">
+            交易活动类型:
+            <select id="keyword1" name="keyword1" class="option_show">
+                <option value="">All</option>
+                <option th:each="item : ${bizType}" th:value="${item.enumValue}"
+                        th:text="${item.enumValueName}"></option>
+            </select>
+            状态:
+            <select id="keyword2" name="keyword2" class="option_show">
+                <option value="">All</option>
+                <option th:each="item : ${contractStatus}" th:value="${item.enumValue}"
+                        th:text="${item.enumValueName}"></option>
+            </select>
+
+            合同名称:
+            <input id="keyword3" type="text" class="input-text option_show" name="keyword3">
+
+            <button class="btn btn-default radius btn_search">确定</button>
+            <button class="btn btn-primary radius btn_open">增加</button>
+
+            <a class="btn btn-success radius" style="margin-left: 70px;"
+               href="javascript:location.replace(location.href);" title="刷新">
+                <i class="btn-refresh Hui-iconfont">&#xe68f;</i></a>
+        </div>
+
+    </div>
+
+    <table id="down_contract_list" class="ui celled table" cellspacing="0"
+           width="100%" align=center>
+        <thead>
+        <tr>
+            <th>合同名称</th>
+            <th>合同甲方</th>
+            <th>合同乙方</th>
+            <th>交易活动类型</th>
+            <th>合同金额</th>
+            <th>预定签订时间</th>
+            <th>实际签订时间</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<!-- 右侧页面 -->
+<div data-options="region:'center'">
+    <div id="reload-add" th:replace="contract/contract-edit::edit"></div>
+
+    <hr style="border: 1px solid #b3b3b3; width: 100%;"/>
+
+    <div id="reload-view" th:replace="contract/contract-edit::view"></div>
+</div>
+
+<div id="selectTenderResult" class="easyui-dialog" title="选择招标结果" style="width:350px;height:150px;"
+     data-options="iconCls:'icon-save',resizable:true, modal: true, closed:true">
+    <select id="tenderResultList" class="option_show">
+        <option value="">无</option>
+        <option th:each="item : ${reports}" th:value="*{item.bidResultCode}" th:text="*{item.tenderPlanCode.workItemName}"></option>
+    </select>
+
+    <select id="supplierList" class="option_show">
+    </select>
+
+    <select id="bizTypeList" class="option_show" readonly="readonly">
+        <option th:each="item : ${bizType}" th:value="${item.enumValue}"
+                th:text="${item.enumValueName}"></option>
+    </select>
+
+    <button class="btn btn-primary btn_add">确定</button>
+</div>
+
+<div id="upload_dialog" class="easyui-dialog" title="上传合同附件" style="width:350px;height:150px;"
+     data-options="iconCls:'icon-save',resizable:true, modal: true, closed:true">
+    <input id="file" type="file">
+
+    <button class="btn btn-primary" id="upload">上传</button>
+</div>
+
+</body>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var basePath = "/";
+    var departmentName = [[${departmentName}]];
+    var attachmentList;
+    var checkRecordList;
+    $(document).ready(function () {
+        getSupplierList();
+        var downContractList;
+        downContractList = $("#down_contract_list").DataTable({
+            ajax: basePath + "contract/down/dataList",
+            columns: [
+                {
+                    data: "contractName",
+                    "sDefaultContent": ""
+                },
+                {data: "contractPartFirst", "sDefaultContent": ""},
+                {data: "contractPartSecond.supplierName", "sDefaultContent": ""},
+                {
+                    data: "bizType", "sDefaultContent": "",
+                    render: function (data, type, full, meta) {
+                        var text = $("#keyword1 option[value='" + data + "']").text();
+                        return text;
+                    }
+                },
+                {data: "contractAmount", "sDefaultContent": ""},
+                {data: "expectedSignDate", "sDefaultContent": ""},
+                {data: "actualSignDate", "sDefaultContent": ""},
+                {
+                    data: "status", "sDefaultContent": "",
+                    render: function (data, type, full, meta) {
+                        var text = $("#keyword2 option[value='" + data + "']").text();
+                        return text;
+                    }
+                },
+                {
+                    data: "downContractCode",
+                    "sClass": "center",
+                    "orderable": false,
+                    render: function (data, type, full, meta) {
+                        var html = "";
+                        if (full.status == '1') {
+                            html += "<a style='text-decoration: none;' href='javascript:;' class='a-link contract-submit'>提交</a> " +
+                                "<a style='text-decoration: none;' href='javascript:;' class='a-link contract-delete'>删除</a> ";
+                        }
+                        if (full.status > 1 && full.status < 50 && full.taskId) {
+                            html += '<a style="text-decoration:none" class="a-link" onClick="layerOpen(\'审批\',\'' + basePath + 'activiti/showTaskView/' + full.taskId + '\',\'800\',\'500\')" href="javascript:;">审批</a> ';
+                        }
+                        html += "<a style='text-decoration: none;' href='javascript:;' class='a-link details-control'>清单&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>";
+                        return html;
+                    }
+                }
+            ],
+            language: {"sEmptyTable": "数据为空"},
+            select: {
+                style: "single"
+            }
+        });
+
+        downContractList.on("select", function (e, dt, type, indexes) {
+            var data = downContractList.rows(indexes).data()[0];
+            console.log(data.downContractCode);
+            if (data.downContractCode == undefined) {
+                return;
+            }
+            $.ajax({
+                url: basePath + 'contract/down/getDownContract',
+                type: 'get',
+                data: {downContractCode: data.downContractCode},
+                dataType: 'json',
+                success: function (data) {
+                    $("#downContractInfo").trigger("reset");
+                    $("#workItemName").val($("#tenderResultList option[value='" + data['tenderResultCode'] + "']").text());
+                    $("#bizTypeName").val($("#bizTypeList option[value='"+data['bizType']+"']").text());
+                    $("#contractPartSecond-supplierCreditCode").val(data.contractPartSecond.supplierCreditCode);
+                    $("#contractPartSecond-supplierName").val(data.contractPartSecond.supplierName);
+                    for (var key in data) {
+                        $("#" + key).val(data[key]);
+                    }
+                }
+            });
+
+            if (attachmentList != undefined) {
+                console.log("attachmentList is not undefined");
+                attachmentList.clear().draw();
+                console.log(data);
+                attachmentList.ajax.url(
+                    basePath + "contractAtt/getContractAttList?fileInNames=" + (data.contractAttach == undefined ? '' : data.contractAttach)
+                ).load();
+            } else {
+                console.log("attachmentList is undefined");
+                console.log(data);
+                attachmentList = $("#contract-attachment").DataTable({
+                    "searching": false,
+                    "info": false,
+                    "ordering": false,
+                    "paging": false,
+                    language: {"sEmptyTable": "数据为空"},
+                    ajax: basePath + "contractAtt/getContractAttList?fileInNames="
+                            + (data.contractAttach == undefined ? '' : data.contractAttach),
+                    columns: [
+
+                        {data: 'actualFileName', "sDefaultContent": ""},
+                        {data: 'type', "sDefaultContent": ""},
+                        {
+                            data: null,
+                            "render": function (data, type, full, meta) {
+
+                                return '<a style="text-decoration:none" class="ml-5" onClick="downloadFile(\''
+                                    + data.location
+                                    + '\',\''
+                                    + data.actualFileName
+                                    + '\')" href="javascript:;" title="下载">下载</a>';
+                            }
+                        }
+                    ]
+                });
+            }
+
+            if (checkRecordList != undefined) {
+                checkRecordList.clear().draw();
+                checkRecordList.ajax.url(
+                    basePath + 'activiti/getTrackList?businessKey=contractCheck-' + data.downContractCode
+                ).load();
+
+            } else {
+
+                checkRecordList = $("#contract-checkRecord").DataTable({
+                    "searching": false,
+                    "info": false,
+                    "ordering": false,
+                    "paging": false,
+                    language: {"sEmptyTable": "数据为空"},
+                    ajax: basePath + "activiti/getTrackList?businessKey=contractCheck-" + data.downContractCode,
+                    columns: [{
+                        data: "name",
+                        "sDefaultContent": ""
+                    }, {
+                        data: "claim",
+                        "sDefaultContent": ""
+                    },{
+                        data: "dealername",
+                        "sDefaultContent": ""
+                    }, {
+                        data: "dealtime",
+                        "sDefaultContent": ""
+                    }]
+                });
+            }
+        });
+
+        downContractList.on("user-select", function (e, dt, type, cell, originalEvent) {
+            if (originalEvent.target.nodeName.toLowerCase() === 'a') {
+                e.preventDefault();
+            }
+            //下面注释的代码不要删除
+            // var tr = $(originalEvent.target).closest('tr');
+            // var data = downContractList.row(tr).data();
+            // if (data.status != '1') {
+            //     e.preventDefault();
+            // }
+            //以上代码不要删除
+        });
+
+        downContractList.on("deselect", function (e, dt, type, indexes) {
+            $("#downContractInfo").trigger("reset");
+            if (attachmentList != undefined) {
+                console.log("destroy");
+                attachmentList.clear().draw();
+            }
+
+            if (checkRecordList != undefined) {
+                console.log("destroy");
+                checkRecordList.clear().draw();
+            }
+
+        });
+
+        $(".btn_search").click(function () {
+            var url = basePath + "contract/down/dataList?";
+            var bizType = $("#keyword1").val();
+            var status = $("#keyword2").val();
+            var contractName = $("#keyword3").val();
+            url += "bizType=" + bizType + "&status=" + status + "&contractName=" + contractName;
+            downContractList.ajax.url(url).load();
+        });
+
+        $(".btn_open").click(function () {
+            $("#selectTenderResult").dialog("open");
+        });
+
+        $(".btn-upload").click(function () {
+            if ($("#downContractCode").val() != "") {
+                $("#upload_dialog").dialog("open");
+            }
+            console.log("upload click");
+        });
+
+        $(".btn_add").click(function () {
+            if ($("#bizTypeList").val() == undefined) {
+                alert("请选择交易活动类型!");
+                return false;
+            }
+            $("#downContractInfo").trigger("reset");
+            $("#tenderResultCode").val($("#tenderResultList").val());
+            $("#workItemName").val($("#tenderResultList option:selected").text());
+            $("#bizType").val($("#bizTypeList").val());
+            $("#bizTypeName").val($("#bizTypeList option:selected").text());
+            $("#contractPartFirst").val(departmentName);
+            $("#contractPartSecond-supplierCreditCode").val($("#supplierList").val());
+            $("#contractPartSecond-supplierName").val($("#supplierList option:selected").text());
+            $("#selectTenderResult").dialog("close");
+        });
+
+        $("#upload").click(function () {
+            var formdata = new FormData();
+            formdata.append("file", $("#file")[0].files[0]);
+            formdata.append("contractCode", $("#downContractCode").val());
+            $.ajax({
+                url: basePath + 'contract/down/upload',
+                type: 'post',
+                data: formdata,
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data === "success") {
+                        location.replace(location.href);
+                    }
+                }
+            });
+        });
+
+        $(".btn_save").click(function () {
+            $("#downContractInfo").validate({
+                submitHandler: function (form) {
+                    $(form).ajaxSubmit({
+                        success: function (data) {
+                            if (data.msg === 'success') {
+                                alert("保存成功!");
+                                location.replace(location.href);
+                            } else if (data.msg === 'failed') {
+                                alert(data.errorMsg);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        $(".btn-template").click(function () {
+            window.open(basePath + "contract/conApp.doc");
+        });
+        
+        $("#tenderResultList").change(getSupplierList);
+
+        $("#down_contract_list tbody").on('click', 'a.contract-submit', function () {
+            var tr = $(this).closest('tr');
+            var row = downContractList.row(tr);
+            var downContractCode = row.data().downContractCode;
+            if (downContractCode == undefined) {
+                return;
+            }
+            console.log(downContractCode);
+            $.ajax({
+                type: 'POST',
+                url: basePath + 'contract/down/submitDownContract',
+                data: {contractCode: row.data().downContractCode},
+                dataType: 'json',
+                success: function (data) {
+                    if (data.msg == 'success') {
+                        alert("提交成功");
+                        location.reload();
+                    }
+                }
+            });
+        });
+
+        $("#down_contract_list tbody").on('click', 'a.contract-delete', function () {
+            var tr = $(this).closest('tr');
+            var row = downContractList.row(tr);
+            var downContractCode = row.data().downContractCode;
+            if (downContractCode == undefined) {
+                return;
+            }
+            console.log(downContractCode);
+            $.ajax({
+                type: 'POST',
+                url: basePath + 'contract/down/deleteDownContract',
+                data: {contractCode: row.data().downContractCode},
+                dataType: 'json',
+                success: function (data) {
+                    if (data.msg == 'success') {
+                        alert("删除成功");
+                        location.reload();
+                    }
+                }
+            });
+        });
+
+        $('#down_contract_list tbody').on('click', 'a.details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = downContractList.row(tr);
+            if (row.data().downContractCode == undefined) {
+                return;
+            }
+            console.log(row.data().downContractCode);
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+            } else {
+                // Open this row
+                var detailStr =
+                    '<table id="detail' + row.data().downContractCode + '" cellpadding="5" class="detail" cellspacing="0" border="0" style="padding-left:50px;">' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th style="width:15%;">位置</th>' +
+                    '<th style="width:15%;">项目名称</th>' +
+                    '<th style="width:20%;">项目特征及工作内容</th>' +
+                    '<th style="width:10%;">单位</th>' +
+                    '<th style="width:10%;">工程数量</th>' +
+                    '<th style="width:10%;">单价</th>' +
+                    '<th style="width:10%;">合价</th>' +
+                    '<th style="width:10%;">备注</th>' +
+                    '</tr>' +
+                    '</thead>';
+                jQuery.ajax({
+                    type: 'POST',
+                    url: basePath + 'workBill/findWorkBillByContractCode',
+                    data: {contractCode: row.data().downContractCode},
+                    dataType: 'json',
+                    success: function (data) {
+                        detailStr += "<tbody>"
+                        for (var i = 0; i < data.data.length; i++) {
+                            detailStr += "<tr><td>" + data.data[i].divisionSnCode.divName + "</td><td>"
+                                + data.data[i].name + "</td><td>"
+                                + data.data[i].charactDes + "</td><td>"
+                                + data.data[i].unit + "</td><td>"
+                                + data.data[i].rawConMapQuan + "</td><td>"
+                                + (data.data[i].contractUnitPrice == undefined ? '' : data.data[i].contractUnitPrice) + "</td><td>"
+                                + data.data[i].quotaManualFee + "</td>"
+                                + "<td></td></tr>";
+                        }
+                        row.child(detailStr + "</tbody></table>").show();
+                        console.log(detailStr);
+                        tr.addClass('shown');
+                        $("#detail" + row.data().downContractCode)
+                        // Highlight on drag entering drop zone.
+                            .bind('dragenter', function (ev) {
+                                //$(ev.target).addClass('dragover');
+                                return false;
+                            })
+                            // Un-highlight on drag leaving drop zone.
+                            .bind('dragleave', function (ev) {
+                                //$(ev.target).removeClass('dragover');
+                                return false;
+                            })
+                            // Decide whether the thing dragged in is welcome.
+                            .bind('dragover', function (ev) {
+                                return false;
+                            })
+                            .bind('drop', function (ev) {
+                                if (row.data().tenderResultCode) {
+                                    alert("通过招标结果创建的合同不允许拖入清单项!");
+                                    return false;
+                                } else {
+                                    var dt = ev.originalEvent.dataTransfer;
+                                    var text = dt.getData("text").split("_");
+                                    /*
+                                    1.获得拖入的清单项的divisionSnCode
+                                    2.通过ajax将清单项加入到合同中
+                                     */
+                                    var data = {};
+                                    data.divisionSnCode = text[0];
+                                    data.downContractCode = row.data().downContractCode;
+                                    $.ajax({
+                                        url : '/contract/down/addSubDivWorkBill',
+                                        type : 'POST',
+                                        data : data,
+                                        dataType : 'json',
+                                        success : function (data) {
+                                            if (data.msg == 'success') {
+                                                location.reload();
+                                            } else if (data.msg == 'failed') {
+                                                alert(data.errorMsg);
+                                            }
+                                        }
+                                    });
+
+                                }
+                            })
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+            return false;
+        });
+    });
+    function initSupplierList(data) {
+        $("#supplierList").empty();
+        for (var i = 0; i < data.length; i++) {
+            var supplier = data[i];
+            var option = $("<option></option>");
+            option.val(supplier.supplierCreditCode);
+            option.text(supplier.supplierName);
+            $("#supplierList").append(option);
+        }
+    }
+    function getSupplierList() {
+        var tenderResultCode = $("#tenderResultList").val();
+
+        if (tenderResultCode == "") {
+            $.ajax({
+                url : '/supplier/getAllSupplier',
+                type : 'GET',
+                success : function (data) {
+                    console.log(data);
+                    initSupplierList(data.data);
+                }
+            });
+        } else {
+            $.ajax({
+                url: '/supplier/findByTenderResult',
+                type: 'GET',
+                data: {tenderResultCode: tenderResultCode},
+                success: function (data) {
+                    console.log(data);
+                    initSupplierList(data);
+                }
+            });
+        }
+    }
+
+    function downloadFile(fileRealPath, fileName) {
+        window.open(basePath + "contractAtt/fileDownload?fileRealPath=" + fileRealPath
+            + "&fileName=" + encodeURI(encodeURI(fileName)));
+    }
+
+    /*弹出页面*/
+    function layerOpen(title,url,id,w,h){
+        var index = layer.open({
+            type: 2,
+            title: title,
+            content: url
+        });
+        layer.full(index);
+    }
+    /*]]>*/
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script>
+</html>

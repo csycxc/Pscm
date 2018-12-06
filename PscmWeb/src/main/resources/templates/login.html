@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--[if lt IE 9]>
+<script type="text/javascript" src="static/lib/html5shiv.js"></script>
+<script type="text/javascript" src="static/lib/respond.min.js"></script>
+<![endif]-->
+<link href="static/css/H-ui.min.css" th:href="@{/css/H-ui.min.css}" rel="stylesheet" type="text/css" />
+<link href="static/css/H-ui.login.css" th:href="@{/css/H-ui.login.css}" rel="stylesheet" type="text/css" />
+<link href="static/css/style.css" th:href="@{/css/style.css}" rel="stylesheet" type="text/css" />
+<link href="static/lib/Hui-iconfont/1.0.8/iconfont.css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" rel="stylesheet" type="text/css" />
+<!--[if IE 6]>
+<script type="text/javascript" src="static/lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+<script>DD_belatedPNG.fix('*');</script>
+<![endif]-->
+<title>施工项目现场控制与管理系统</title>
+
+</head>
+<body>
+<div class="header" ><p align=left><font size=6 color=white>&nbsp;&nbsp;施工项目现场控制与管理系统 v1.0</font></p>
+<p align="right"><a th:href="@{/tenderPlan/getTotalReleaseTenderPlan}"><font size=4 color=white>招标计划（公告）</font></a></p>
+</div>
+<div class="loginWraper">
+  <div id="loginform" class="loginBox">
+    <form class="form form-horizontal" action="login.htm" th:action="@{/checkLogin.htm}" method="post" id="login_form">
+      <div class="row cl">
+        <label class="form-label col-xs-3"><i class="Hui-iconfont">&#xe60d;</i></label>
+        <div class="formControls col-xs-8">
+          <input id="tenderPlanCode" name="tenderPlanCode" th:value="${tenderPlanCode}" type="hidden">
+          <input id="tenantaccount" name="tenantaccount" th:value="${account}" type="text" required="required" placeholder="租户" class="input-text size-L">
+        </div>
+      </div>
+      <div class="row cl">
+        <label class="form-label col-xs-3"><i class="Hui-iconfont">&#xe60d;</i></label>
+        <div class="formControls col-xs-8">
+          <input id="username" name="username" type="text" required="required" placeholder="账户" class="input-text size-L">
+        </div>
+      </div>
+      <div class="row cl">
+        <label class="form-label col-xs-3"><i class="Hui-iconfont">&#xe60e;</i></label>
+        <div class="formControls col-xs-8">
+          <input id="password" name="password" type="password" required="required" placeholder="密码" class="input-text size-L">
+        </div>
+      </div>
+	   	<div >
+	   		<label class="form-label col-xs-3"><i class="">&#xe60e;</i></label>
+	   		<div class="formControls col-xs-8" id="msg" th:text="${session?.SPRING_SECURITY_LAST_EXCEPTION?.message}">
+	    		<!-- <%-- ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message} --%> -->
+	    	</div>
+	    </div>
+      <div class="row cl">
+        <div class="formControls col-xs-8 col-xs-offset-3">
+          <label for="online">
+            <input type="checkbox" name="remember-me" id="online">
+            使我保持登录状态</label>
+            <label for="isSupplier">&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="checkbox" name="isSupplier" id="isSupplier" value="Y" th:checked="${tenderPlanCode!= null}">
+            供方</label>
+        </div>
+      </div>
+      <div class="row cl">
+        <div class="formControls col-xs-8 col-xs-offset-3">
+          <input name="" type="submit" class="btn btn-success radius size-L" value="&nbsp;登&nbsp;&nbsp;&nbsp;&nbsp;录&nbsp;">
+          <input name="" type="reset" class="btn btn-default radius size-L" value="&nbsp;取&nbsp;&nbsp;&nbsp;&nbsp;消&nbsp;">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="footer">Copyright Banry v1.0</div>
+<script type="text/javascript" src="static/lib/jquery/1.9.1/jquery.min.js" th:src="@{/lib/jquery/1.9.1/jquery.min.js}"></script> 
+<script type="text/javascript" src="static/js/H-ui.min.js" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" src="static/js/delCookie.js" th:src="@{/js/delCookie.js}"></script>
+<script type="text/javascript">
+	
+	/* $(function(){	
+    	var uname=$('input[name="username"]').val();
+		var options = { 
+			type: 'POST',
+			url: '[[@{/login.htm}]]',
+			data: {
+				"username":uname
+			},
+	        success : function(xhr, status, err) {
+	        	setCookie("name","value",60*60*24);
+	        	window.location = '[[@{/index}]]';
+			},  
+	        //dataType: 'json',
+			error : function(xhr, status, err) {
+				var o = eval("(" +xhr.responseText+")")
+				$("#msg").html(o.message);
+			}
+	    }; 
+	    $("#login_form").submit(function(){ 
+	        $(this).ajaxSubmit(options); 
+	        return false;   //防止表单自动提交
+	    });
+	}); */
+</script>
+
+</body>
+</html>

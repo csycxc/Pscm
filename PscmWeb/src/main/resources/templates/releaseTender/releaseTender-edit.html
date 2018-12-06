@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+</head>
+<body>
+
+<div th:fragment="topbar">
+	<form id="releaseTenderInfo" name="tenderPlanInfo" style="padding-top: 30px;padding-left: 20px;padding-right: 0px;">
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">工程名称:</label>
+			<div class="formControls col-xs-3 col-sm-3" style="margin-left: -40px;">
+				<input type="text" value="" placeholder="" id="engFullName" name="engFullName" class="input-text">
+			</div>
+			<label class="form-label col-xs-3">工作项名称:</label>
+			<div class="formControls col-xs-3 col-sm-3" style="margin-left: -40px;">
+				<input type="text" value="" placeholder="" id="workItemName" name="workItemName" class="input-text" readonly="readonly">
+			</div>
+		</div>
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">交易活动类型:</label>
+			<div class="formControls col-xs-3 col-sm-3" style="margin-left: -10px;">
+				<select name="bizType" id="bizType" class="bizType_option option_show" style="margin-left: -20px;width: 110px;"></select>
+				<!-- <input type="text" value="" placeholder="" id="bizType" name="bizType" class="input-text" readonly="readonly"> -->
+			</div>
+			<label class="form-label col-xs-3">招 标 方 式:</label>
+			<div class="formControls col-xs-3 col-sm-3" style="margin-left: -10px;">
+				<select name="tenderWay" id="tenderWay" class="tenderWay_option option_show" style="margin-left: -30px;margin-right: 5px;float: left;width: 110px;"></select>
+				<!-- <input type="text" value="" placeholder="" id="tenderWay" name="tenderWay" class="input-text" readonly="readonly"> -->
+			</div>
+		</div>
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">计划招标时间:</label>
+			<div class="formControls col-xs-3 col-sm-3" style="margin-left: -30px;width: 250px;">
+				<input type="date" value="" placeholder="" id="tenderPlanDate" name="tenderPlanDate" class="input-text" readonly="readonly">
+			</div>
+		</div>
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">最迟进场时间:</label>
+			<div class="formControls col-xs-3 col-sm-3" style="margin-left: -30px;width: 250px;">
+				<input type="date" value="" placeholder="" id="latestMarchinDate" name="latestMarchinDate" class="input-text" readonly="readonly">
+			</div>
+		</div>
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">招标主要内容:</label>
+			<div class="formControls col-xs-3 col-sm-2" style="width: 496px;">
+				<textarea class="input-text" id="mainContents" name="mainContents" style="height: 80px;" readonly="readonly"></textarea>
+			</div>
+		</div>
+		<div class="row cl" style="padding-bottom: 30px;">
+			<label class="form-label col-xs-3">招标要求:</label>
+			<div class="formControls col-xs-3 col-sm-2" style="width: 496px;">
+				<textarea class="input-text" id="requirements" name="requirements" style="height: 80px;" readonly="readonly"></textarea>
+			</div>
+		</div>
+	</form>	
+
+	<div class="row cl" style="padding-bottom: 30px;width:530px;padding-left: 20px;padding-right: 0px;">
+		<label class="form-label col-xs-3" style="padding-top: 20px;padding-bottom: 10px;">发布目标:</label>
+		<!-- <table id="release" style="table-layout:fixed">
+			<thead>
+				<tr style="height: 30px;text-align: center" id="release_thead">
+					<td title="清除目标名称再保存则可以删除本行">目标名称</td><td>地址</td><td>开始时间</td><td>结束时间</td>
+				</tr>
+			</thead>
+			<tbody id="release_tbody">
+				<tr style="height: 30px;">
+					<td onblur="check_empty()"></td><td></td><td></td><td></td>
+				</tr>
+			</tbody>
+		</table> -->
+		<div style="float:right;margin:10px 0px 10px 5px;display: none;" id="releaseBut">
+			<button type="button" class="btn btn-default" id="add-btn" title="增加">
+				<span style="color:#008000;background-color:#efefef;font-weight:bold;"></span>
+				<span class="glyphicon glyphicon-plus"></span>
+			</button>
+			<button type="button" class="btn btn-default" id="del-btn" title="删除">
+				<span style="color:#008000;background-color:#efefef;font-weight:bold;"></span>
+				<span class="glyphicon glyphicon-trash"></span>
+			</button>
+		</div>
+		<table id="release" class="table table-bordered table-striped" width="100%">
+		</table>
+	</div>
+	<form id="releaseTarget" name="releaseTarget">
+		<!-- <input type="hidden" name="flag" id="flag" value=""> -->
+		<input type="hidden" name="operate" id="operate" value="">
+		<input type="hidden" name="tenderPlanCode" id="tenderPlanCode" value="">
+		<input type="hidden" name="JSONText" id="JSONText" value="">
+	</form>
+	<div class="row cl" id="btn_save" style="display: none;">
+		<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3" style="margin-left: 20px;">
+			<input class="btn btn-primary radius release-save" type="button" value="&nbsp;&nbsp;保存&nbsp;&nbsp;" style="margin-right: 40px;">
+			<input class="btn btn-primary radius release-submit" type="button" value="&nbsp;&nbsp;发布&nbsp;&nbsp;">
+		</div>
+	</div>
+</div>
+</body>
+</html>

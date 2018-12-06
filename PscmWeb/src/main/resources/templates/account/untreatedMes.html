@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+<link rel="stylesheet" th:href="@{/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css}" type="text/css">
+<script type="text/javascript" th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery/semantic.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>
+<title>个人事务</title>
+<style>
+	.troubleContainer-ul{padding-left:30px;}
+	.troubleContainer-ul li{list-style:none;}
+	li{margin-top: 15px;}
+	li>a{cursor: pointer;color: blue;text-decoration: underline;}
+	a:hover{color:red;text-decoration: underline;}
+</style>
+</head>
+<body>
+<article class="page-container">
+	<div id="troubleTreatMes">
+		<p class="troubleContainer-title"></p>
+		<div id="troubleContainer">
+			<ul class="troubleContainer-ul">----------------------------------------------------隐患处理--------------------------------------------------
+			</ul>
+		</div>
+	</div>
+</article>
+<script th:inline="javascript">
+var basePath = /*[[@{/}]]*/;  
+var url=null;
+$(document).ready(function(){
+	jQuery.ajax({
+		type:"post",
+		url:basePath + "hiddenTroubleTreat/getUnTreatedMes",
+        dataType: 'json',
+		success: function(data){
+			if(data){
+				for(var i in data){
+					for(var j=0;j<data[i].length;j++){
+						url=basePath + "hiddenTroubleTreat/task/view/"+data[i][j].taskId;
+						$(".troubleContainer-ul").append('<li><a onclick="aClick(url)" class="assignment">'+data[i][j].divname+' :  '+data[i][j].troublename+' :  '+data[i][j].taskName+'</a></li>');
+					}
+				}
+			}
+		}
+	});  
+
+});
+
+function aClick(url){
+	var treeNode = { id:'200', name:'安全质量管理' ,dataUrl:"menu?prCode=" + '200'};
+	Hui_admin_tab_tree(treeNode); 
+		setTimeout(function() {
+		parent.frames["mainframe_200"].frames["mainframe200"].location=url;
+		var index = parent.layer.getFrameIndex(window.name);
+	    parent.layer.close(index);
+	}, 100);
+	
+}
+
+</script>
+</body>
+</html>

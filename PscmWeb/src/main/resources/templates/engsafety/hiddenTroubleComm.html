@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="headBar">
+<meta charset="utf-8">
+<link th:href="@{/css/jquery.dataTables.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/semantic.min.css}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/css/dataTables.semanticui.min.css}"
+	rel="stylesheet" type="text/css" />
+<link th:href="@{/lib/lightbox2/2.8.1/css/lightbox.css}" rel="stylesheet" type="text/css" >
+
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/skin/default/skin.css}" id="skin" />
+
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery-1.12.4.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/jquery.dataTables.min.js}"></script>
+<script type="text/javascript"
+	th:src="@{/lib/jquery/semantic.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/H-ui.admin.js}"></script>	
+
+<script th:inline="javascript">
+/*<![CDATA[*/  
+var basePath = /*[[@{/}]]*/;  
+/*]]>*/
+String.prototype.IsPicture = function()
+{
+    //判断是否是图片 - strFilter必须是小写列举
+    var strFilter=".jpeg|.gif|.jpg|.png|.bmp|.pic|"
+    if(this.indexOf(".")>-1)
+    {
+        var p = this.lastIndexOf(".");
+        //alert(p);
+        //alert(this.length);
+        var strPostfix=this.substring(p,this.length) + '|';        
+        strPostfix = strPostfix.toLowerCase();
+        //alert(strPostfix);
+        if(strFilter.indexOf(strPostfix)>-1)
+        {
+            //alert("True");
+            return true;
+        }
+    }        
+    //alert('False');
+    return false;            
+}
+function downloadFile(fileRealPath, fileName) {
+	window.open(basePath + "contractAtt/fileDownload?fileRealPath=" + fileRealPath
+			+ "&fileName=" + encodeURI(encodeURI(fileName)));
+};
+
+$(document).ready(function() {
+	$('#fileList').DataTable({
+		ajax : basePath + "contractAtt/getContractAttList",
+		fnServerParams : function (aoData) {
+			aoData.push(
+				{ name : "fileInNames", value : $("#troubleAttach").val()}
+			);
+		},
+		columns : [{
+			data : null,
+			"render": function (data, type, full, meta) {
+				if (data.type.IsPicture()) {
+					return  '<a href="' + /*[[@{/}]]*/
+							+ data.location + '" data-lightbox="gallery" data-title="' + data.actualFileName + '">'
+							+ data.actualFileName
+							+ '</a>';
+				} else {
+					return '<a style="text-decoration:none" class="ml-5" onClick="downloadFile(\''
+							+ data.location
+							+ '\',\''
+							+ data.actualFileName
+							+ '\')" href="javascript:;" title="下载">'
+							+ data.actualFileName
+							+ '</a>';
+				}
+            }
+        }]
+	});
+});
+</script>
+</head>
+	<div th:fragment="detailHtt">
+		<input type="hidden" th:value="${htt!=null}?${htt.troubleCode}" placeholder="" id="troubleCode" name="troubleCode">
+		<input type="hidden"  id="divisionSnCode" name="divisionSnCode"  th:value="${htt!=null}?${htt.divisionSnCode}">
+		<input type="hidden"  id="troubleAttach" name="troubleAttach"  th:value="${htt!=null}?${htt.troubleAttach}">
+		<!-- <input type="hidden" class="input-text" id="divname" name="divname" readonly="readonly" th:value="${htt!=null}?${htt.divname}"> -->
+		<input type="hidden" class="input-text" th:value="${htt!=null&&htt.rectifyPostpone!=null}?${htt.rectifyPostpone}" readonly="readonly" placeholder="" id="rectifyPostpone" name="rectifyPostpone">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">排查内容：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" id="investContent" name="investContent" readonly="readonly" th:value="${htt!=null}?${htt.troubleBillItemCode.investContent}">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>隐患发生地点：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" id="takePlace" name="takePlace" readonly="readonly" th:value="${htt!=null}?${htt.takePlace}">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">开始时间：</label>
+			<div class="formControls col-xs-3 col-sm-2">
+				<input type="text"  th:value="${htt!=null}?${htt.startDate}" readonly="readonly" id="startDate" name="startDate" class="input-text Wdate">
+			</div>
+			<label class="form-label col-xs-4 col-sm-2">扣分时间：</label>
+			<div class="formControls col-xs-3 col-sm-2">
+				<input type="text"  th:value="${htt!=null}?${#dates.format(htt.deductDate, 'yyyy-MM-dd')}" readonly="readonly"  id="deductDate" name="deductDate" class="input-text Wdate">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">整改期限：</label>
+			<div class="formControls col-xs-3 col-sm-2">
+				<input type="text"  th:value="${htt!=null}?${#dates.format(htt.rectifyTimeLimit, 'yyyy-MM-dd')}" readonly="readonly" id="rectifyTimeLimit" name="rectifyTimeLimit" class="input-text Wdate">
+			</div>
+			<label class="form-label col-xs-4 col-sm-2">罚款金额：</label>
+			<div class="formControls col-xs-3 col-sm-1">
+				<input type="number" class="input-text" th:value="${htt!=null&&htt.amercement!=null} ? ${htt.amercement}" readonly="readonly" placeholder="" id="amercement" name="amercement">
+			</div>
+			<label class="form-label col-xs-4 col-sm-2">实际扣分：</label>
+			<div class="formControls col-xs-3 col-sm-1">
+				<input type="number" class="input-text" th:value="${htt!=null&&htt.realDeduct!=null} ? ${htt.realDeduct}" readonly="readonly" placeholder="" id="realDeduct" name="realDeduct">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">描述：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<textarea class="input-text" id="description" name="description" readonly="readonly" style="height:150px;" th:text="${htt!=null&&htt.description!=null} ?  ${htt.description}"></textarea>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">已上传文件：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<table id="fileList" class="ui celled table" cellspacing="0"
+					width="100%" align=center>
+					<thead>
+						<tr>
+							<th>名称</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+<footer th:fragment="footerBar">
+<!--/请在上方写此页面业务相关的脚本-->
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script> 
+<script type="text/javascript" th:src="@{/lib/lightbox2/2.8.1/js/lightbox.js}"></script> 
+</footer>
+</html>
